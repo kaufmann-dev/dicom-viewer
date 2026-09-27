@@ -6,7 +6,7 @@ passcode opens only the DICOM series and STL models selected for it. The people 
 passcode to, such as your doctors, get a read-only viewer:
 
 - **CT/MR volumes:** 3D MPR (axial, sagittal, coronal) with crosshairs, plus a 3D volume
-  rendering with presets
+  rendering with presets and, for CT, an adjustable HU threshold
 - **Other images:** 2D stack viewer, e.g. for X-rays, topograms and secondary captures
 - **Structured reports:** DICOM SR text reports and radiation dose reports, rendered as readable
   text

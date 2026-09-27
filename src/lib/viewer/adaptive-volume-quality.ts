@@ -8,12 +8,13 @@ const SETTLE_MS = 200;
 
 /**
  * Renders a 3D volume viewport with coarse ray sampling while the user interacts with it and at
- * full quality once they stop. Returns a cleanup function.
+ * full quality once they stop. `interact` does the same for changes made outside the viewport,
+ * such as dragging a slider.
  */
 export function adaptiveVolumeQuality(
 	element: HTMLElement,
 	getViewport: () => Types.IVolumeViewport | undefined
-): () => void {
+): { interact: () => void; destroy: () => void } {
 	let interactive = false;
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -44,19 +45,22 @@ export function adaptiveVolumeQuality(
 		settle(0);
 	}
 
-	function onWheel() {
+	function interact() {
 		setInteractive(true);
 		settle(SETTLE_MS);
 	}
 
 	element.addEventListener('pointerdown', onPointerDown, { capture: true });
-	element.addEventListener('wheel', onWheel, { capture: true, passive: true });
+	element.addEventListener('wheel', interact, { capture: true, passive: true });
 
-	return () => {
-		clearTimeout(timer);
-		element.removeEventListener('pointerdown', onPointerDown, { capture: true });
-		element.removeEventListener('wheel', onWheel, { capture: true });
-		window.removeEventListener('pointerup', onPointerUp);
-		window.removeEventListener('pointercancel', onPointerUp);
+	return {
+		interact,
+		destroy() {
+			clearTimeout(timer);
+			element.removeEventListener('pointerdown', onPointerDown, { capture: true });
+			element.removeEventListener('wheel', interact, { capture: true });
+			window.removeEventListener('pointerup', onPointerUp);
+			window.removeEventListener('pointercancel', onPointerUp);
+		}
 	};
 }

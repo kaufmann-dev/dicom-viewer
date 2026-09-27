@@ -6,6 +6,7 @@
 		Enums,
 		RenderingEngine,
 		setVolumesForViewports,
+		utilities,
 		volumeLoader,
 		type Types
 	} from '@cornerstonejs/core';
@@ -17,6 +18,7 @@
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Slider } from '$lib/components/ui/slider';
 	import {
 		add3dTools,
 		addViewingTools,
@@ -32,6 +34,7 @@
 	} from './cornerstone';
 	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
+	import { presetThreshold, shiftPreset, THRESHOLD_SHIFT } from './volume-threshold';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -73,13 +76,17 @@
 	// The page re-creates this component per item, so the initial modality is sufficient.
 	let vrReady = $state(false);
 	let vrPreset = $state(untrack(() => (modality === 'MR' ? 'MR-Default' : 'CT-Bone')));
+	const basePreset = $derived(CONSTANTS.VIEWPORT_PRESETS.find((p) => p.name === vrPreset)!);
+	// HU thresholds only make sense for CT; MR intensities have no fixed scale.
+	const baseThreshold = $derived(modality === 'CT' ? presetThreshold(basePreset) : null);
+	let vrThreshold = $state(0);
 
 	let engine: RenderingEngine | undefined;
 	let mprGroup: ToolTypes.IToolGroup | undefined;
+	let adaptiveQuality: ReturnType<typeof adaptiveVolumeQuality> | undefined;
 
 	onMount(() => {
 		let destroyed = false;
-		let stopAdaptiveQuality = () => {};
 		const resizeObserver = new ResizeObserver(() => engine?.resize(true, false));
 
 		async function start() {
@@ -143,8 +150,9 @@
 			await setVolumesForViewports(engine!, [{ volumeId }], [viewportIds['3d']]);
 			if (destroyed) return;
 			vrReady = true;
+			resetVrThreshold();
 			applyVrPreset();
-			stopAdaptiveQuality = adaptiveVolumeQuality(
+			adaptiveQuality = adaptiveVolumeQuality(
 				elements['3d']!,
 				() => engine?.getViewport(viewportIds['3d']) as Types.IVolumeViewport | undefined
 			);
@@ -159,7 +167,7 @@
 
 		return () => {
 			destroyed = true;
-			stopAdaptiveQuality();
+			adaptiveQuality?.destroy();
 			resizeObserver.disconnect();
 			ToolGroupManager.destroyToolGroup(mprGroupId);
 			ToolGroupManager.destroyToolGroup(vrGroupId);
@@ -186,8 +194,16 @@
 
 	function applyVrPreset() {
 		const viewport = engine?.getViewport(viewportIds['3d']) as Types.IVolumeViewport | undefined;
-		viewport?.setProperties({ preset: vrPreset });
-		viewport?.render();
+		if (!viewport) return;
+		utilities.applyPreset(
+			viewport.getDefaultActor().actor as Types.VolumeActor,
+			baseThreshold === null ? basePreset : shiftPreset(basePreset, vrThreshold - baseThreshold)
+		);
+		viewport.render();
+	}
+
+	function resetVrThreshold() {
+		vrThreshold = baseThreshold ?? 0;
 	}
 
 	function reset() {
@@ -198,6 +214,7 @@
 		}
 		if (vrReady) {
 			(engine.getViewport(viewportIds['3d']) as Types.IVolumeViewport).resetCamera();
+			resetVrThreshold();
 			applyVrPreset();
 		}
 		engine.render();
@@ -243,6 +260,7 @@
 				value={vrPreset}
 				onValueChange={(value) => {
 					vrPreset = value;
+					resetVrThreshold();
 					applyVrPreset();
 				}}
 			>
@@ -252,6 +270,27 @@
 			</DropdownMenu.RadioGroup>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
+	{#if baseThreshold !== null}
+		<div class="flex items-center gap-2 text-sm">
+			<span class="text-muted-foreground">Threshold</span>
+			<Slider
+				type="single"
+				class="w-32"
+				min={baseThreshold - THRESHOLD_SHIFT.below}
+				max={baseThreshold + THRESHOLD_SHIFT.above}
+				step={THRESHOLD_SHIFT.step}
+				value={vrThreshold}
+				onValueChange={(value) => {
+					vrThreshold = value;
+					adaptiveQuality?.interact();
+					applyVrPreset();
+				}}
+				disabled={!vrReady}
+				aria-label="3D threshold in HU"
+			/>
+			<span class="min-w-16 text-right tabular-nums">{Math.round(vrThreshold)} HU</span>
+		</div>
+	{/if}
 </ViewerToolbar>
 
 <div class="relative min-h-0 flex-1 bg-black" bind:this={container}>

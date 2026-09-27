@@ -37,7 +37,8 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Register instances with `prefetchPart10Instance` before building volumes. The wadouri loader reads naturalized metadata; `dataSetCacheManager` does not feed it.
 - Stack viewports do not apply the stored VOI automatically. Use `defaultVoiRange`.
 - The 3D viewport is attached only after the volume has finished loading, so it is not re-rendered for every slice.
-- 3D rendering cost scales with ray sample distance × canvas pixels. `adaptiveVolumeQuality` renders with 3× coarser sampling while the pointer is down or the wheel moves, then renders once at full quality. Volume textures are 16-bit (`preferSizeOverAccuracy`).
+- 3D rendering cost scales with ray sample distance × canvas pixels. `adaptiveVolumeQuality` renders with 3× coarser sampling while the pointer is down, the wheel moves or its `interact()` is called (threshold slider), then renders once at full quality. Volume textures are 16-bit (`preferSizeOverAccuracy`).
+- The CT 3D threshold slider moves the selected preset's opacity and color points along the HU axis (`shiftPreset` in `src/lib/viewer/volume-threshold.ts`) and applies it with `utilities.applyPreset`, because `setProperties({ preset })` is typed for preset names only.
 - 3D views rotate as turntables around patient superior (+Z in DICOM/STL coordinates): `TurntableRotateTool` (a `BaseTool`, so it does not reset the camera on resize like the trackball) for Cornerstone, and `camera.up` set before constructing `OrbitControls` for STL. Do not switch back to `TrackballRotateTool`, which accumulates roll.
 - Overview thumbnails (`src/lib/viewer/thumbnails.ts`) use `loadImageToCanvas` with `useCPURendering: true`. Its GPU path shares one hidden rendering engine and stalls under concurrent calls.
 - Use unique IDs for rendering engines and tool groups for each mount. On destroy, clean up with `cache.purgeCache()` and `clearInstanceMetadata()`.
