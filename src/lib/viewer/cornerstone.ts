@@ -12,11 +12,11 @@ import {
 	LengthTool,
 	PanTool,
 	StackScrollTool,
-	TrackballRotateTool,
 	WindowLevelTool,
 	ZoomTool,
 	type Types as ToolTypes
 } from '@cornerstonejs/tools';
+import { TurntableRotateTool } from './turntable-rotate-tool';
 
 let initialized = false;
 
@@ -32,7 +32,7 @@ export function initCornerstone(): void {
 		StackScrollTool,
 		LengthTool,
 		CrosshairsTool,
-		TrackballRotateTool
+		TurntableRotateTool
 	]) {
 		addTool(tool);
 	}
@@ -116,10 +116,10 @@ export function addViewingTools(toolGroup: ToolTypes.IToolGroup, tools: PrimaryT
 }
 
 export function add3dTools(toolGroup: ToolTypes.IToolGroup): void {
-	toolGroup.addTool(TrackballRotateTool.toolName);
+	toolGroup.addTool(TurntableRotateTool.toolName);
 	toolGroup.addTool(PanTool.toolName);
 	toolGroup.addTool(ZoomTool.toolName);
-	toolGroup.setToolActive(TrackballRotateTool.toolName, {
+	toolGroup.setToolActive(TurntableRotateTool.toolName, {
 		bindings: [{ mouseButton: MouseBindings.Primary }]
 	});
 	toolGroup.setToolActive(PanTool.toolName, {

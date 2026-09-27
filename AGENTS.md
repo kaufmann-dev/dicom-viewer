@@ -36,6 +36,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Register instances with `prefetchPart10Instance` before building volumes. The wadouri loader reads naturalized metadata; `dataSetCacheManager` does not feed it.
 - Stack viewports do not apply the stored VOI automatically. Use `defaultVoiRange`.
 - The 3D viewport is attached only after the volume has finished loading, so it is not re-rendered for every slice.
+- 3D views rotate as turntables around patient superior (+Z in DICOM/STL coordinates): `TurntableRotateTool` for Cornerstone, and `camera.up` set before constructing `OrbitControls` for STL. Do not switch back to `TrackballRotateTool`, which accumulates roll.
 - Use unique IDs for rendering engines and tool groups for each mount. On destroy, clean up with `cache.purgeCache()` and `clearInstanceMetadata()`.
 
 ## Svelte and UI

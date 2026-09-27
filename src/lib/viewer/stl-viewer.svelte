@@ -42,6 +42,9 @@
 		camera.add(headlight);
 		scene.add(camera);
 
+		// STL models exported from DICOM use patient coordinates, where +Z is superior. OrbitControls
+		// reads camera.up once at construction, so it must be set before creating the controls.
+		camera.up.set(0, 0, 1);
 		const controls = new OrbitControls(camera, renderer.domElement);
 		const material = new MeshStandardMaterial({ color: 0xe8e2d6, roughness: 0.6, metalness: 0 });
 		let bounds = new Sphere(new Vector3(), 1);
@@ -65,7 +68,6 @@
 			camera.near = distance / 100;
 			camera.far = distance * 100;
 			camera.position.copy(bounds.center).add(new Vector3(0, -distance, distance * 0.35));
-			camera.up.set(0, 0, 1);
 			controls.target.copy(bounds.center);
 			camera.updateProjectionMatrix();
 			controls.update();
