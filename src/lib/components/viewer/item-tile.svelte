@@ -51,10 +51,10 @@
 
 <a
 	href={resolve('/view/[itemId]', { itemId: item.id })}
-	class="group flex min-w-0 flex-col focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+	class="group flex min-w-0 flex-col rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 >
 	<div
-		class="relative flex aspect-square items-center justify-center overflow-hidden bg-black text-neutral-500"
+		class="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-black text-neutral-500"
 		{@attach lazyThumbnail}
 	>
 		{#if src}
@@ -63,7 +63,9 @@
 			<Icon class="size-10" aria-hidden="true" />
 		{/if}
 		{#if item.volume}
-			<span class="absolute top-2 left-2 bg-white px-1.5 py-0.5 text-xs font-semibold text-black">
+			<span
+				class="absolute top-2 left-2 rounded-md bg-white/85 px-1.5 py-0.5 text-xs font-semibold text-neutral-800"
+			>
 				3D
 			</span>
 		{/if}
