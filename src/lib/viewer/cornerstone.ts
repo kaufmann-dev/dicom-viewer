@@ -22,7 +22,9 @@ let initialized = false;
 
 export function initCornerstone(): void {
 	if (initialized) return;
-	coreInit();
+	// 16-bit volume textures: half the GPU memory and bandwidth of float32. CT values are integers,
+	// so display precision is unaffected.
+	coreInit({ rendering: { preferSizeOverAccuracy: true }, debug: {} });
 	dicomImageLoaderInit({ maxWebWorkers: Math.min(navigator.hardwareConcurrency || 2, 4) });
 	toolsInit();
 	for (const tool of [

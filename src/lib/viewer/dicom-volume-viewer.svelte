@@ -26,6 +26,7 @@
 		type PrimaryTool,
 		type WindowPreset
 	} from './cornerstone';
+	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -72,6 +73,7 @@
 
 	onMount(() => {
 		let destroyed = false;
+		let stopAdaptiveQuality = () => {};
 		const resizeObserver = new ResizeObserver(() => engine?.resize(true, false));
 
 		async function start() {
@@ -135,6 +137,10 @@
 			if (destroyed) return;
 			vrReady = true;
 			applyVrPreset();
+			stopAdaptiveQuality = adaptiveVolumeQuality(
+				elements['3d']!,
+				() => engine?.getViewport(viewportIds['3d']) as Types.IVolumeViewport | undefined
+			);
 		}
 
 		start().catch((error) => {
@@ -144,6 +150,7 @@
 
 		return () => {
 			destroyed = true;
+			stopAdaptiveQuality();
 			resizeObserver.disconnect();
 			ToolGroupManager.destroyToolGroup(mprGroupId);
 			ToolGroupManager.destroyToolGroup(vrGroupId);
