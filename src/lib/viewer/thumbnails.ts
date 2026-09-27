@@ -1,5 +1,6 @@
-import { cache as imageCache, utilities } from '@cornerstonejs/core';
+import { cache as imageCache, metaData, utilities } from '@cornerstonejs/core';
 import { clearInstanceMetadata, imageIdFor, initCornerstone } from './cornerstone';
+import { overlayBitmap, overlayPlanes } from './dicom-overlay';
 
 const SIZE = 320;
 const CONCURRENCY = 4;
@@ -25,13 +26,30 @@ async function render(instanceId: string): Promise<string> {
 	canvas.height = SIZE;
 	// CPU rendering: the GPU path shares one hidden rendering engine and stalls when used
 	// concurrently.
-	await utilities.loadImageToCanvas({
-		canvas,
-		imageId: imageIdFor(instanceId),
-		thumbnail: true,
-		useCPURendering: true
-	});
+	const imageId = imageIdFor(instanceId);
+	await utilities.loadImageToCanvas({ canvas, imageId, thumbnail: true, useCPURendering: true });
+	drawOverlays(canvas, imageId);
 	return canvas.toDataURL('image/jpeg', 0.85);
+}
+
+/** Draws the image's overlay planes where the CPU renderer fitted the image: scaled and centered. */
+function drawOverlays(canvas: HTMLCanvasElement, imageId: string) {
+	const planes = overlayPlanes(metaData.get('naturalized', imageId));
+	const image = imageCache.getImage(imageId);
+	if (!planes.length || !image) return;
+	const scale = Math.min(canvas.width / image.columns, canvas.height / image.rows);
+	const left = (canvas.width - image.columns * scale) / 2;
+	const top = (canvas.height - image.rows * scale) / 2;
+	const context = canvas.getContext('2d')!;
+	for (const plane of planes) {
+		context.drawImage(
+			overlayBitmap(plane),
+			left + plane.x * scale,
+			top + plane.y * scale,
+			plane.columns * scale,
+			plane.rows * scale
+		);
+	}
 }
 
 export function cachedThumbnail(instanceId: string): string | undefined {

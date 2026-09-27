@@ -16,6 +16,7 @@ import {
 	ZoomTool,
 	type Types as ToolTypes
 } from '@cornerstonejs/tools';
+import { DicomOverlayTool } from './dicom-overlay-tool';
 import { TurntableRotateTool } from './turntable-rotate-tool';
 
 let initialized = false;
@@ -34,7 +35,8 @@ export function initCornerstone(): void {
 		StackScrollTool,
 		LengthTool,
 		CrosshairsTool,
-		TurntableRotateTool
+		TurntableRotateTool,
+		DicomOverlayTool
 	]) {
 		addTool(tool);
 	}

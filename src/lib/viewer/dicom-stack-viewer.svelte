@@ -15,6 +15,7 @@
 		type PrimaryTool,
 		type WindowPreset
 	} from './cornerstone';
+	import { DicomOverlayTool } from './dicom-overlay-tool';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -53,6 +54,8 @@
 			});
 			group = ToolGroupManager.createToolGroup(groupId)!;
 			addViewingTools(group, TOOLS);
+			group.addTool(DicomOverlayTool.toolName);
+			group.setToolEnabled(DicomOverlayTool.toolName);
 			group.addViewport(viewportId, engineId);
 			applyToolBindings(group, TOOLS, primary);
 
