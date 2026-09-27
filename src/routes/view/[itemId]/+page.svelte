@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 	import { Button } from '$lib/components/ui/button';
+	import { downloadHref } from '$lib/download';
 	import { itemTypeText } from '$lib/item-kind';
 	import { formatDicomDate } from '$lib/sr';
 	import DicomStackViewer from '$lib/viewer/dicom-stack-viewer.svelte';
@@ -35,6 +37,19 @@
 			{[itemTypeText(item), study].filter(Boolean).join(' · ')}
 		</p>
 	</div>
+	{#if data.canDownload}
+		<Button
+			variant="ghost"
+			size="icon"
+			class="ml-auto"
+			href={downloadHref({ item: item.id })}
+			download
+			aria-label="Download"
+			title="Download"
+		>
+			<DownloadIcon />
+		</Button>
+	{/if}
 </div>
 
 {#key item.id}

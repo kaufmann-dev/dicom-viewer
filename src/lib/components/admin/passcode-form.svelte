@@ -20,6 +20,7 @@
 			label: string;
 			code: string;
 			expiresAt: Date;
+			allowDownload: boolean;
 			itemIds: string[];
 		} | null;
 		onSaved: () => void;
@@ -36,6 +37,7 @@
 	const initial = (() => passcode)();
 	let label = $state(initial?.label ?? '');
 	let code = $state(initial?.code ?? '');
+	let allowDownload = $state(initial?.allowDownload ?? false);
 	let expiresLocal = $state(toLocalInput(initial?.expiresAt ?? new Date(Date.now() + 30 * DAY)));
 	const selected = new SvelteSet<string>(initial?.itemIds ?? []);
 	let error = $state('');
@@ -89,6 +91,7 @@
 >
 	{#if passcode}<input type="hidden" name="id" value={passcode.id} />{/if}
 	<input type="hidden" name="expiresAt" value={expiresIso} />
+	<input type="hidden" name="allowDownload" value={allowDownload ? 'on' : ''} />
 	{#each selected as id (id)}<input type="hidden" name="itemId" value={id} />{/each}
 
 	<div class="flex flex-col gap-4 px-4">
@@ -139,6 +142,19 @@
 						{days} days
 					</Button>
 				{/each}
+			</div>
+		</div>
+		<div class="flex items-start gap-2">
+			<Checkbox
+				id="passcode-downloads"
+				bind:checked={allowDownload}
+				aria-describedby="passcode-downloads-hint"
+			/>
+			<div class="flex flex-col gap-1">
+				<Label for="passcode-downloads">Allow downloads</Label>
+				<p id="passcode-downloads-hint" class="text-xs text-muted-foreground">
+					Shows download buttons for the shared items.
+				</p>
 			</div>
 		</div>
 	</div>

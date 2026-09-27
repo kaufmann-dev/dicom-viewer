@@ -1,7 +1,8 @@
-import { and, eq, inArray, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne, sql, type SQL } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { instance, item, passcodeItem, project } from '$lib/server/db/schema';
 import { itemOrder, type CatalogItem, type CatalogProject } from '$lib/catalog';
+import type { DownloadRow } from '$lib/server/download';
 
 function viewerItemIds(passcodeId: string) {
 	return db
@@ -22,6 +23,60 @@ export async function canAccessItem(locals: App.Locals, itemId: string): Promise
 		.from(item)
 		.where(and(eq(item.id, itemId), accessFilter(locals)));
 	return Boolean(row);
+}
+
+/** Admins may always download; viewers only when their passcode allows it. */
+export function canDownload(locals: App.Locals): boolean {
+	return Boolean(locals.admin || locals.viewer?.allowDownload);
+}
+
+export type DownloadFilter = { itemId: string } | { projectId: string; study?: string };
+
+/** Stored files the caller may download, in item and slice order. `study: 'stl'` selects 3D models. */
+export async function downloadRows(
+	locals: App.Locals,
+	filter: DownloadFilter
+): Promise<DownloadRow[]> {
+	if (!canDownload(locals)) return [];
+	let scope: SQL | undefined;
+	if ('itemId' in filter) {
+		scope = eq(item.id, filter.itemId);
+	} else if (filter.study === 'stl') {
+		scope = and(eq(item.projectId, filter.projectId), eq(item.kind, 'stl'));
+	} else if (filter.study !== undefined) {
+		scope = and(
+			eq(item.projectId, filter.projectId),
+			eq(item.studyInstanceUid, filter.study),
+			ne(item.kind, 'stl')
+		);
+	} else {
+		scope = eq(item.projectId, filter.projectId);
+	}
+	return db
+		.select({
+			projectName: project.name,
+			itemId: item.id,
+			kind: item.kind,
+			label: item.label,
+			seriesNumber: item.seriesNumber,
+			studyInstanceUid: item.studyInstanceUid,
+			studyDate: item.studyDate,
+			studyDescription: item.studyDescription,
+			createdAt: item.createdAt,
+			path: instance.path,
+			size: instance.size
+		})
+		.from(instance)
+		.innerJoin(item, eq(item.id, instance.itemId))
+		.innerJoin(project, eq(project.id, item.projectId))
+		.where(and(scope, accessFilter(locals)))
+		.orderBy(
+			asc(item.studyDate),
+			asc(item.seriesNumber),
+			asc(item.label),
+			asc(item.id),
+			asc(instance.sortKey)
+		);
 }
 
 type CatalogRow = Omit<CatalogItem, 'thumbnailInstanceId'> & {

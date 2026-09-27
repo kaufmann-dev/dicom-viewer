@@ -45,7 +45,12 @@ export async function readViewerSession(cookies: Cookies): Promise<App.Locals['v
 	if (!token) return null;
 	const now = new Date();
 	const [row] = await db
-		.select({ passcodeId: passcode.id, label: passcode.label, expiresAt: viewerSession.expiresAt })
+		.select({
+			passcodeId: passcode.id,
+			label: passcode.label,
+			expiresAt: viewerSession.expiresAt,
+			allowDownload: passcode.allowDownload
+		})
 		.from(viewerSession)
 		.innerJoin(passcode, eq(passcode.id, viewerSession.passcodeId))
 		.where(

@@ -62,6 +62,7 @@
 				<Table.Head>Label</Table.Head>
 				<Table.Head>Code</Table.Head>
 				<Table.Head>Expires</Table.Head>
+				<Table.Head>Downloads</Table.Head>
 				<Table.Head class="text-right">Items</Table.Head>
 				<Table.Head><span class="sr-only">Actions</span></Table.Head>
 			</Table.Row>
@@ -89,6 +90,7 @@
 						{#if passcode.expired}<span class="font-medium">Expired</span> ·{/if}
 						{dateFormat.format(passcode.expiresAt)}
 					</Table.Cell>
+					<Table.Cell>{passcode.allowDownload ? 'Allowed' : '—'}</Table.Cell>
 					<Table.Cell class="text-right tabular-nums">{passcode.itemIds.length}</Table.Cell>
 					<Table.Cell>
 						<div class="flex justify-end gap-1">

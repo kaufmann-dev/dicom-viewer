@@ -1,0 +1,1 @@
+ALTER TABLE "passcode" ADD COLUMN "allow_download" boolean DEFAULT false NOT NULL;

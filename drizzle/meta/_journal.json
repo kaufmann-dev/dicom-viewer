@@ -8,6 +8,13 @@
       "when": 1790503688594,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790537311937,
+      "tag": "0001_passcode-allow-download",
+      "breakpoints": true
     }
   ]
 }

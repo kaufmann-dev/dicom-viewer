@@ -3,10 +3,12 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import ItemTile from '$lib/components/viewer/item-tile.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { downloadHref } from '$lib/download';
 	import { Input } from '$lib/components/ui/input';
 	import { NativeSelect, NativeSelectOption } from '$lib/components/ui/native-select';
 	import * as Segmented from '$lib/components/segmented';
@@ -141,8 +143,17 @@
 				</label>
 			{/if}
 
-			<h1 class="text-2xl font-semibold tracking-tight">{project.name}</h1>
-			<p class="mt-1 text-sm text-muted-foreground">{summary(project)}</p>
+			<div class="flex flex-wrap items-start gap-3">
+				<div class="mr-auto min-w-0">
+					<h1 class="text-2xl font-semibold tracking-tight">{project.name}</h1>
+					<p class="mt-1 text-sm text-muted-foreground">{summary(project)}</p>
+				</div>
+				{#if data.canDownload}
+					<Button variant="outline" href={downloadHref({ project: project.id })} download>
+						<DownloadIcon />Download all
+					</Button>
+				{/if}
+			</div>
 
 			<div class="mt-6 flex flex-wrap items-center gap-3">
 				<div class="relative w-full sm:w-72">
@@ -195,6 +206,17 @@
 						</h2>
 						{#if study.date && study.description}
 							<span class="text-sm text-muted-foreground">{study.description}</span>
+						{/if}
+						{#if data.canDownload}
+							<Button
+								variant="ghost"
+								size="sm"
+								class="ml-auto text-muted-foreground"
+								href={downloadHref({ project: project.id, study: study.key })}
+								download
+							>
+								<DownloadIcon />Download
+							</Button>
 						{/if}
 					</div>
 

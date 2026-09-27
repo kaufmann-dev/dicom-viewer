@@ -12,6 +12,7 @@ const saveSchema = z.object({
 	label: nameSchema,
 	code: codeSchema,
 	expiresAt: z.coerce.date({ error: 'Choose an expiry date.' }),
+	allowDownload: z.boolean(),
 	itemIds: z.array(idSchema)
 });
 
@@ -37,10 +38,11 @@ export const actions: Actions = {
 			label: form.get('label'),
 			code: form.get('code'),
 			expiresAt: form.get('expiresAt') || undefined,
+			allowDownload: form.get('allowDownload') === 'on',
 			itemIds: form.getAll('itemId')
 		});
 		if (!parsed.success) return fail(400, { message: parsed.error.issues[0].message });
-		const { id, label, code, expiresAt, itemIds } = parsed.data;
+		const { id, label, code, expiresAt, allowDownload, itemIds } = parsed.data;
 
 		const [taken] = await db
 			.select({ id: passcode.id })
@@ -49,7 +51,7 @@ export const actions: Actions = {
 		if (taken) return fail(400, { message: 'This code is already used by another passcode.' });
 
 		const passcodeId = await db.transaction(async (tx) => {
-			const values = { label, code, expiresAt };
+			const values = { label, code, expiresAt, allowDownload };
 			const [saved] = id
 				? await tx.update(passcode).set(values).where(eq(passcode.id, id)).returning()
 				: await tx.insert(passcode).values(values).returning();

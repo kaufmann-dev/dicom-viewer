@@ -70,6 +70,7 @@
 		"@cornerstonejs/tools": "^5.11.0",
 		"@lucide/svelte": "^1.48.0",
 		"better-auth": "^1.7.6",
+		"client-zip": "^2.5.1",
 		"dcmjs": "^0.52.0",
 		"mode-watcher": "^1.1.0",
 		"three": "^0.186.1",

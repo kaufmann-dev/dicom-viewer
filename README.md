@@ -14,6 +14,10 @@ passcode to, such as your doctors, get a read-only viewer:
 
 All three image viewers provide window/level, pan, zoom and length measurement.
 
+The admin, and viewers whose passcode allows it, can download a series, a study or a whole
+project. DICOM downloads are ZIP files organized as `Project/Study/Series/IM00001.dcm` in slice
+order, with STL models under `Project/3D models/`. A single STL model downloads as the `.stl` file.
+
 DICOM files are recognized by content, so folders without file extensions or a DICOMDIR work.
 JPEG Lossless, JPEG, JPEG-LS, JPEG 2000, HTJ2K, RLE and uncompressed transfer syntaxes are
 decoded in the browser by Cornerstone3D.
@@ -64,11 +68,15 @@ Uploaded files are stored under `DATA_DIR` (`./data` locally). The database only
    upload area. Uploading a folder twice, or overlapping folders, skips instances that are
    already stored.
 3. Under **Passcodes**, create a passcode. Give it a label, a code of your choice (at least six
-   letters or digits; case, spaces and dashes are ignored) and an expiry, then select the items
-   it may open. Checking a project selects all of its items.
-4. Share the site link and the code. The code works until it expires. Editing a passcode's items,
-   or deleting the passcode, takes effect immediately, including for viewers who are already
-   signed in. A viewer session lasts at most seven days.
+   letters or digits; case, spaces and dashes are ignored), an expiry and whether downloads are
+   allowed, then select the items it may open. Checking a project selects all of its items.
+4. Share the site link and the code. The code works until it expires. Editing a passcode's items
+   or download setting, or deleting the passcode, takes effect immediately, including for viewers
+   who are already signed in. A viewer session lasts at most seven days.
+
+**Allow downloads** is off by default. Turning it off hides the download buttons and blocks the
+download endpoint, but it cannot stop a viewer from saving the images that the browser loads to
+display them.
 
 After five wrong passcodes, an IP address is blocked for 15 minutes.
 

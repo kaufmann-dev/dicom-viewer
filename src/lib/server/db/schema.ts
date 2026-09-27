@@ -75,6 +75,7 @@ export const passcode = pgTable('passcode', {
 	label: text('label').notNull(),
 	code: text('code').notNull().unique(),
 	expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+	allowDownload: boolean('allow_download').notNull().default(false),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
 

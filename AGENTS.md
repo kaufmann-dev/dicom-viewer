@@ -26,6 +26,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Admin = any Better Auth (OIDC) session. The OIDC provider is the only admission control, so do not add email or claim allowlists.
 - Viewers use passcode sessions (`src/lib/server/viewer-auth.ts`). A session is valid only while both the session and its passcode are unexpired and exist.
 - Every endpoint that returns item data or files must check `canAccessItem` in `src/lib/server/access.ts`. Answer with 404 instead of 403 so item existence is not revealed.
+- Downloads (`/api/files/download`) go through `downloadRows`/`canDownload` in `access.ts`. Admins can always download. Viewers can download only when their passcode has `allowDownload`. Archive naming lives in `src/lib/server/download.ts`.
 - `hooks.server.ts` guards `/admin`, `/api/admin`, `/view` and `/api/files`. New routes under other prefixes need their own checks.
 - Uploads must send `Content-Type: application/octet-stream`. SvelteKit drops bodies that have no content type.
 

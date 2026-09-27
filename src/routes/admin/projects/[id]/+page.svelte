@@ -3,12 +3,14 @@
 	import { enhance } from '$app/forms';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import XIcon from '@lucide/svelte/icons/x';
 	import ConfirmDelete from '$lib/components/admin/confirm-delete.svelte';
 	import UploadPanel from '$lib/components/admin/upload-panel.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
+	import { downloadHref } from '$lib/download';
 	import * as Table from '$lib/components/ui/table';
 	import { itemTypeText } from '$lib/item-kind';
 	import { formatDicomDate } from '$lib/sr';
@@ -60,6 +62,11 @@
 			<PencilIcon />
 		</Button>
 		<span class="flex-1"></span>
+		{#if data.items.length}
+			<Button variant="outline" href={downloadHref({ project: data.project.id })} download>
+				<DownloadIcon />Download
+			</Button>
+		{/if}
 		<ConfirmDelete
 			action="?/delete"
 			id={data.project.id}

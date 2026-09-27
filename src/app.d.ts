@@ -6,7 +6,12 @@ declare global {
 			/** Set when the request carries a valid OIDC admin session. */
 			admin: { id: string; name: string; email: string } | null;
 			/** Set when the request carries a valid passcode session (and no admin session). */
-			viewer: { passcodeId: string; label: string; expiresAt: Date } | null;
+			viewer: {
+				passcodeId: string;
+				label: string;
+				expiresAt: Date;
+				allowDownload: boolean;
+			} | null;
 		}
 	}
 }
