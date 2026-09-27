@@ -12,7 +12,11 @@
 	import { ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
 	import { Progress } from '$lib/components/ui/progress';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
-	import { NativeSelect, NativeSelectOption } from '$lib/components/ui/native-select';
+	import BoxIcon from '@lucide/svelte/icons/box';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import {
 		add3dTools,
 		addViewingTools,
@@ -39,6 +43,8 @@
 		{ id: 'coronal', label: 'Coronal' },
 		{ id: '3d', label: '3D' }
 	];
+	const LAYOUT_ITEM =
+		'text-muted-foreground hover:bg-transparent data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm';
 	const TOOLS: PrimaryTool[] = ['crosshairs', 'windowLevel', 'pan', 'zoom', 'length'];
 	const VR_PRESETS = $derived(
 		CONSTANTS.VIEWPORT_PRESETS.map((p) => p.name).filter((name) =>
@@ -213,32 +219,43 @@
 	onPreset={applyWindow}
 	onReset={reset}
 >
-	<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
-	<div class="flex items-center gap-2">
-		<span class="text-xs text-muted-foreground" id="{uid}-layout-label">Layout</span>
-		<ToggleGroup.Root
-			type="single"
-			size="sm"
-			variant="outline"
-			value={layout}
-			onValueChange={changeLayout}
-			aria-labelledby="{uid}-layout-label"
+	<ToggleGroup.Root
+		type="single"
+		size="sm"
+		spacing={1}
+		value={layout}
+		onValueChange={changeLayout}
+		aria-label="Layout"
+		class="rounded-2xl bg-muted p-0.5"
+	>
+		<ToggleGroup.Item value="grid" class={LAYOUT_ITEM}><LayoutGridIcon />All</ToggleGroup.Item>
+		{#each PANES as pane (pane.id)}
+			<ToggleGroup.Item value={pane.id} class={LAYOUT_ITEM}>{pane.label}</ToggleGroup.Item>
+		{/each}
+	</ToggleGroup.Root>
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger
+			class={buttonVariants({ variant: 'outline', size: 'sm' })}
+			disabled={!vrReady}
+			aria-label="3D preset: {vrPreset}"
 		>
-			<ToggleGroup.Item value="grid">All</ToggleGroup.Item>
-			{#each PANES as pane (pane.id)}
-				<ToggleGroup.Item value={pane.id}>{pane.label}</ToggleGroup.Item>
-			{/each}
-		</ToggleGroup.Root>
-	</div>
-	<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
-	<label class="flex items-center gap-2 text-xs text-muted-foreground">
-		3D preset
-		<NativeSelect size="sm" bind:value={vrPreset} onchange={applyVrPreset} disabled={!vrReady}>
-			{#each VR_PRESETS as name (name)}
-				<NativeSelectOption value={name}>{name}</NativeSelectOption>
-			{/each}
-		</NativeSelect>
-	</label>
+			<BoxIcon />3D: {vrPreset}<ChevronDownIcon class="text-muted-foreground" />
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content align="end" class="min-w-64">
+			<DropdownMenu.Label>3D presets</DropdownMenu.Label>
+			<DropdownMenu.RadioGroup
+				value={vrPreset}
+				onValueChange={(value) => {
+					vrPreset = value;
+					applyVrPreset();
+				}}
+			>
+				{#each VR_PRESETS as name (name)}
+					<DropdownMenu.RadioItem value={name}>{name}</DropdownMenu.RadioItem>
+				{/each}
+			</DropdownMenu.RadioGroup>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
 </ViewerToolbar>
 
 <div class="relative min-h-0 flex-1 bg-black" bind:this={container}>
