@@ -1,4 +1,4 @@
-import { init as coreInit, type RenderingEngine, type Types } from '@cornerstonejs/core';
+import { init as coreInit, type Types } from '@cornerstonejs/core';
 import {
 	init as dicomImageLoaderInit,
 	prefetchPart10Instance
@@ -162,26 +162,4 @@ export function defaultVoiRange(image: Types.IImage): Types.VOIRange {
 		lower: image.minPixelValue * slope + intercept,
 		upper: image.maxPixelValue * slope + intercept
 	};
-}
-
-type ContextPoolEngine = {
-	contextPool?: {
-		getAllContexts(): { getOpenGLRenderWindow(): { getContext(): WebGLRenderingContext | null } }[];
-	};
-};
-
-/**
- * Destroys a rendering engine and releases its WebGL contexts right away. Cornerstone's destroy
- * leaves the contexts (and their volume textures) alive until the browser evicts them, so every
- * visit to a viewer would otherwise hold on to hundreds of MB of GPU memory.
- */
-export function destroyRenderingEngine(engine: RenderingEngine): void {
-	// The public RenderingEngine delegates to an implementation that owns the context pool.
-	const implementation = (engine as unknown as { _implementation?: ContextPoolEngine })
-		._implementation;
-	const contexts = (implementation?.contextPool?.getAllContexts() ?? [])
-		.map((context) => context.getOpenGLRenderWindow().getContext())
-		.filter((gl): gl is WebGLRenderingContext => Boolean(gl));
-	engine.destroy();
-	for (const gl of contexts) gl.getExtension('WEBGL_lose_context')?.loseContext();
 }

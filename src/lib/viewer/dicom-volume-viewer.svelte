@@ -22,7 +22,6 @@
 		initCornerstone,
 		prefetchInstances,
 		clearInstanceMetadata,
-		destroyRenderingEngine,
 		voiRange,
 		type PrimaryTool,
 		type WindowPreset
@@ -155,7 +154,7 @@
 			resizeObserver.disconnect();
 			ToolGroupManager.destroyToolGroup(mprGroupId);
 			ToolGroupManager.destroyToolGroup(vrGroupId);
-			if (engine) destroyRenderingEngine(engine);
+			engine?.destroy();
 			cache.purgeCache();
 			clearInstanceMetadata();
 		};

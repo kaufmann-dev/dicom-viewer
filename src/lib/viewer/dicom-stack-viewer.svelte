@@ -10,7 +10,6 @@
 		imageIdFor,
 		initCornerstone,
 		clearInstanceMetadata,
-		destroyRenderingEngine,
 		defaultVoiRange,
 		voiRange,
 		type PrimaryTool,
@@ -75,7 +74,7 @@
 			resizeObserver.disconnect();
 			element.removeEventListener(Enums.Events.STACK_NEW_IMAGE, onNewImage);
 			ToolGroupManager.destroyToolGroup(groupId);
-			if (engine) destroyRenderingEngine(engine);
+			engine?.destroy();
 			cache.purgeCache();
 			clearInstanceMetadata();
 		};
