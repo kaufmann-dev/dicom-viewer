@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { NativeSelect, NativeSelectOption } from '$lib/components/ui/native-select';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
+	import * as Segmented from '$lib/components/segmented';
 	import {
 		formatStudyDate,
 		isDoseReport,
@@ -159,18 +159,16 @@
 					/>
 				</div>
 				{#if availableFilters.length > 2}
-					<ToggleGroup.Root
-						type="single"
-						size="sm"
+					<Segmented.Root
 						value={activeFilter}
-						onValueChange={(value) => (filter = (value || 'all') as ItemFilter)}
+						onValueChange={(value) => (filter = value as ItemFilter)}
 						aria-label="Show"
 						class="flex-wrap"
 					>
 						{#each availableFilters as f (f.value)}
-							<ToggleGroup.Item value={f.value}>{f.label}</ToggleGroup.Item>
+							<Segmented.Item value={f.value}>{f.label}</Segmented.Item>
 						{/each}
-					</ToggleGroup.Root>
+					</Segmented.Root>
 				{/if}
 			</div>
 

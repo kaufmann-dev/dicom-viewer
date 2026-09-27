@@ -10,11 +10,10 @@
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
+	import * as Segmented from '$lib/components/segmented';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
-	import { SEGMENTED_ITEM } from './segmented';
 
 	let {
 		tools,
@@ -50,11 +49,10 @@
 	aria-label="Viewer tools"
 >
 	<Tooltip.Provider>
-		<ToggleGroup.Root
-			type="single"
-			size="default"
-			variant="outline"
-			bind:value={() => primary, (value) => value && onPrimary(value as PrimaryTool)}
+		<Segmented.Root
+			size="sm"
+			value={primary}
+			onValueChange={(value) => onPrimary(value as PrimaryTool)}
 			aria-label="Left mouse button tool"
 		>
 			{#each tools as tool (tool)}
@@ -62,17 +60,17 @@
 				<Tooltip.Root>
 					<Tooltip.Trigger>
 						{#snippet child({ props })}
-							<ToggleGroup.Item {...props} value={tool} class={SEGMENTED_ITEM}>
+							<Segmented.Item {...props} value={tool}>
 								<Icon />
 								<span class="hidden md:inline">{PRIMARY_TOOL_LABELS[tool]}</span>
 								<span class="sr-only md:hidden">{PRIMARY_TOOL_LABELS[tool]}</span>
-							</ToggleGroup.Item>
+							</Segmented.Item>
 						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content>{PRIMARY_TOOL_HINTS[tool]}</Tooltip.Content>
 				</Tooltip.Root>
 			{/each}
-		</ToggleGroup.Root>
+		</Segmented.Root>
 	</Tooltip.Provider>
 
 	{#if presets.length && onPreset}

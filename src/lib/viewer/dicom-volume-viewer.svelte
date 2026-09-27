@@ -11,7 +11,7 @@
 	} from '@cornerstonejs/core';
 	import { ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
 	import { Progress } from '$lib/components/ui/progress';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
+	import * as Segmented from '$lib/components/segmented';
 	import BoxIcon from '@lucide/svelte/icons/box';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
@@ -32,7 +32,6 @@
 	} from './cornerstone';
 	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
-	import { SEGMENTED_ITEM } from './segmented';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -219,18 +218,17 @@
 	onPreset={applyWindow}
 	onReset={reset}
 >
-	<ToggleGroup.Root
-		type="single"
-		size="default"
-		variant="outline"
-		bind:value={() => layout, (value) => value && changeLayout(value as Layout)}
+	<Segmented.Root
+		size="sm"
+		value={layout}
+		onValueChange={(value) => changeLayout(value as Layout)}
 		aria-label="Layout"
 	>
-		<ToggleGroup.Item value="grid" class={SEGMENTED_ITEM}><LayoutGridIcon />All</ToggleGroup.Item>
+		<Segmented.Item value="grid"><LayoutGridIcon />All</Segmented.Item>
 		{#each PANES as pane (pane.id)}
-			<ToggleGroup.Item value={pane.id} class={SEGMENTED_ITEM}>{pane.label}</ToggleGroup.Item>
+			<Segmented.Item value={pane.id}>{pane.label}</Segmented.Item>
 		{/each}
-	</ToggleGroup.Root>
+	</Segmented.Root>
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger
 			class={buttonVariants({ variant: 'outline', size: 'sm' })}

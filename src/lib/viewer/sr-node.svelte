@@ -1,12 +1,20 @@
 <script lang="ts">
 	import type { SrNode } from '$lib/sr';
+	import SrField from './sr-field.svelte';
 	import SrNodeView from './sr-node.svelte';
 
 	let {
 		node,
 		depth,
-		parentName = ''
-	}: { node: SrNode; depth: number; parentName?: string } = $props();
+		parentName = '',
+		nested = false
+	}: {
+		node: SrNode;
+		depth: number;
+		parentName?: string;
+		/** Modifies the preceding item, e.g. the intent of a reported procedure. */
+		nested?: boolean;
+	} = $props();
 
 	const isText = $derived(node.valueType === 'TEXT');
 	/** Report sections usually repeat their heading as the name of their text. */
@@ -31,19 +39,14 @@
 		<p class="mt-1 whitespace-pre-line">{node.value}</p>
 	</div>
 {:else}
-	<div
-		class="grid grid-cols-1 gap-x-6 border-b py-2 text-sm sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
-	>
-		<span class="text-muted-foreground">{node.name}</span>
-		<span class="break-words">
-			{node.value ?? ''}{#if node.unit}&nbsp;{node.unit}{/if}
-		</span>
-	</div>
-	{#if node.children.length}
-		<div class="border-l pl-4">
-			{#each node.children as child, i (i)}
-				<SrNodeView node={child} depth={depth + 1} />
-			{/each}
-		</div>
-	{/if}
+	<dl>
+		<SrField
+			label={node.name}
+			value={`${node.value ?? ''}${node.unit ? `\u00a0${node.unit}` : ''}`}
+			{nested}
+		/>
+	</dl>
+	{#each node.children as child, i (i)}
+		<SrNodeView node={child} depth={depth + 1} nested />
+	{/each}
 {/if}

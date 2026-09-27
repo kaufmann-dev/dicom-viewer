@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SrDocument } from '$lib/sr';
+	import SrField from './sr-field.svelte';
 	import SrNodeView from './sr-node.svelte';
 
 	let { reports }: { reports: SrDocument[] } = $props();
@@ -14,10 +15,9 @@
 			<article class={i > 0 ? 'mt-12 border-t pt-8' : ''}>
 				<h2 class="text-xl font-semibold tracking-tight">{report.title}</h2>
 				{#if report.header.length}
-					<dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-sm">
+					<dl class="mt-4">
 						{#each report.header as entry, j (j)}
-							<dt class="text-muted-foreground">{entry.label}</dt>
-							<dd>{entry.value}</dd>
+							<SrField label={entry.label} value={entry.value} />
 						{/each}
 					</dl>
 				{/if}
