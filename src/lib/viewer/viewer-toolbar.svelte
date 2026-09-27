@@ -6,8 +6,10 @@
 	import RulerIcon from '@lucide/svelte/icons/ruler';
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
+	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
 
 	let {
 		tools,
@@ -41,21 +43,25 @@
 	role="toolbar"
 	aria-label="Viewer tools"
 >
-	<div class="flex items-center gap-1" role="group" aria-label="Left mouse button tool">
-		{#each tools as tool (tool)}
-			{@const Icon = icons[tool]}
-			<Button
-				variant={primary === tool ? 'default' : 'ghost'}
-				size="sm"
-				aria-pressed={primary === tool}
-				onclick={() => onPrimary(tool)}
-			>
-				<Icon />
-				<span class="hidden md:inline">{PRIMARY_TOOL_LABELS[tool]}</span>
-				<span class="sr-only md:hidden">{PRIMARY_TOOL_LABELS[tool]}</span>
-			</Button>
-		{/each}
-	</div>
+	<Tooltip.Provider>
+		<div class="flex items-center gap-1" role="group" aria-label="Left mouse button tool">
+			{#each tools as tool (tool)}
+				{@const Icon = icons[tool]}
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						class={buttonVariants({ variant: primary === tool ? 'default' : 'ghost', size: 'sm' })}
+						aria-pressed={primary === tool}
+						onclick={() => onPrimary(tool)}
+					>
+						<Icon />
+						<span class="hidden md:inline">{PRIMARY_TOOL_LABELS[tool]}</span>
+						<span class="sr-only md:hidden">{PRIMARY_TOOL_LABELS[tool]}</span>
+					</Tooltip.Trigger>
+					<Tooltip.Content>{PRIMARY_TOOL_HINTS[tool]}</Tooltip.Content>
+				</Tooltip.Root>
+			{/each}
+		</div>
+	</Tooltip.Provider>
 
 	{#if presets.length && onPreset}
 		<span class="mx-1 h-5 w-px bg-border" aria-hidden="true"></span>
@@ -70,3 +76,8 @@
 	<Button variant="ghost" size="sm" onclick={onReset}><RotateCcwIcon />Reset</Button>
 	{@render children?.()}
 </div>
+<p
+	class="shrink-0 border-b bg-background px-3 py-1 text-xs text-muted-foreground pointer-coarse:hidden"
+>
+	{PRIMARY_TOOL_HINTS[primary]} · {MOUSE_HINTS_2D}
+</p>

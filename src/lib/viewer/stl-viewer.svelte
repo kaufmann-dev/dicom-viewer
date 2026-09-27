@@ -7,6 +7,7 @@
 		DirectionalLight,
 		HemisphereLight,
 		Mesh,
+		MOUSE,
 		MeshStandardMaterial,
 		PerspectiveCamera,
 		Scene,
@@ -18,6 +19,7 @@
 	import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 	import { Button } from '$lib/components/ui/button';
 	import { Progress } from '$lib/components/ui/progress';
+	import { MOUSE_HINTS_3D } from './mouse-hints';
 
 	let { instanceId }: { instanceId: string } = $props();
 
@@ -46,6 +48,8 @@
 		// reads camera.up once at construction, so it must be set before creating the controls.
 		camera.up.set(0, 0, 1);
 		const controls = new OrbitControls(camera, renderer.domElement);
+		// Match the Cornerstone 3D view: middle button pans, right button zooms.
+		controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.DOLLY };
 		const material = new MeshStandardMaterial({ color: 0xe8e2d6, roughness: 0.6, metalness: 0 });
 		let bounds = new Sphere(new Vector3(), 1);
 		let frame = 0;
@@ -137,10 +141,10 @@
 	>
 		Wireframe
 	</Button>
-	<span class="ml-auto hidden px-2 text-xs text-muted-foreground sm:inline">
-		Drag to rotate · right-drag to pan · scroll to zoom
-	</span>
 </div>
+<p class="shrink-0 border-b px-3 py-1 text-xs text-muted-foreground pointer-coarse:hidden">
+	{MOUSE_HINTS_3D}
+</p>
 
 <div class="relative min-h-0 flex-1 bg-black">
 	<div class="h-full w-full overflow-hidden" bind:this={container}>

@@ -27,6 +27,7 @@
 		type WindowPreset
 	} from './cornerstone';
 	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
+	import { MOUSE_HINTS_3D } from './mouse-hints';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -262,6 +263,13 @@
 				>
 					{pane.label}
 				</span>
+				{#if pane.id === '3d' && vrReady}
+					<span
+						class="pointer-events-none absolute bottom-1 left-2 text-xs text-neutral-400 pointer-coarse:hidden"
+					>
+						{MOUSE_HINTS_3D}
+					</span>
+				{/if}
 				{#if pane.id === '3d' && phase === 'ready' && !vrReady}
 					<p
 						class="absolute inset-0 flex items-center justify-center text-sm text-neutral-300"

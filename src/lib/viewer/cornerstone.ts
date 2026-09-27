@@ -104,8 +104,9 @@ export function applyToolBindings(
 		if (tool === primary) bindings.push({ mouseButton: MouseBindings.Primary });
 		if (tool === 'pan') bindings.push({ mouseButton: MouseBindings.Auxiliary });
 		if (tool === 'zoom') bindings.push({ mouseButton: MouseBindings.Secondary });
+		// setToolActive merges with previous bindings, so a former primary tool would keep the left button.
+		toolGroup.setToolPassive(TOOL_NAMES[tool], { removeAllBindings: true });
 		if (bindings.length) toolGroup.setToolActive(TOOL_NAMES[tool], { bindings });
-		else toolGroup.setToolPassive(TOOL_NAMES[tool]);
 	}
 }
 
