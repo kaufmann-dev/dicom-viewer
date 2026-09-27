@@ -21,8 +21,14 @@ export function adaptiveVolumeQuality(
 	function setInteractive(value: boolean) {
 		if (value === interactive) return;
 		interactive = value;
+		const viewport = getViewport();
+		if (!viewport) return;
+		// The opacity table is corrected for the sample distance but cached by the opacity
+		// function's modification time. Without this, coarse and fine renders disagree on opacity.
+		const actor = viewport.getDefaultActor().actor as Types.VolumeActor;
+		actor.getProperty().getScalarOpacity(0).modified();
 		// Cornerstone re-renders the viewport after changing the sample distance.
-		getViewport()?.setProperties({
+		viewport.setProperties({
 			sampleDistanceMultiplier: value ? INTERACTIVE_SAMPLE_DISTANCE : IDLE_SAMPLE_DISTANCE
 		});
 	}
