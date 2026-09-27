@@ -1,7 +1,7 @@
-import { and, asc, eq, inArray, type SQL } from 'drizzle-orm';
+import { and, eq, inArray, sql, type SQL } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { item, passcodeItem, project } from '$lib/server/db/schema';
-import type { CatalogItem, CatalogProject } from '$lib/catalog';
+import { instance, item, passcodeItem, project } from '$lib/server/db/schema';
+import { itemOrder, type CatalogItem, type CatalogProject } from '$lib/catalog';
 
 function viewerItemIds(passcodeId: string) {
 	return db
@@ -24,15 +24,21 @@ export async function canAccessItem(locals: App.Locals, itemId: string): Promise
 	return Boolean(row);
 }
 
-/** Groups items by project and study; STL items form their own "3D models" group. */
+type CatalogRow = Omit<CatalogItem, 'thumbnailInstanceId'> & {
+	projectId: string;
+	projectName: string;
+	studyInstanceUid: string | null;
+	studyDate: string | null;
+	studyDescription: string | null;
+};
+
+/**
+ * Groups items by project and study; STL items form their own "3D models" group. Studies are
+ * newest first, and projects are ordered by their newest study.
+ */
 export function groupCatalog(
-	rows: (CatalogItem & {
-		projectId: string;
-		projectName: string;
-		studyInstanceUid: string | null;
-		studyDate: string | null;
-		studyDescription: string | null;
-	})[]
+	rows: CatalogRow[],
+	thumbnails: Map<string, string> = new Map()
 ): CatalogProject[] {
 	const projects = new Map<string, CatalogProject>();
 	for (const row of rows) {
@@ -60,13 +66,43 @@ export function groupCatalog(
 			sopClassUid: row.sopClassUid,
 			instanceCount: row.instanceCount,
 			volume: row.volume,
-			seriesNumber: row.seriesNumber
+			seriesNumber: row.seriesNumber,
+			thumbnailInstanceId: thumbnails.get(row.id) ?? null
 		});
 	}
+
+	const latest = (p: CatalogProject) =>
+		p.studies.reduce((max, s) => ((s.date ?? '') > max ? (s.date ?? '') : max), '');
 	for (const p of projects.values()) {
 		p.studies.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+		for (const s of p.studies) {
+			s.items.sort(
+				(a, b) =>
+					itemOrder(a) - itemOrder(b) ||
+					(a.seriesNumber ?? 0) - (b.seriesNumber ?? 0) ||
+					a.label.localeCompare(b.label)
+			);
+		}
 	}
-	return [...projects.values()];
+	return [...projects.values()].sort(
+		(a, b) => latest(b).localeCompare(latest(a)) || a.name.localeCompare(b.name)
+	);
+}
+
+/** Middle instance (by slice order) of each image item. */
+async function middleInstances(itemIds: string[]): Promise<Map<string, string>> {
+	if (itemIds.length === 0) return new Map();
+	const rows = await db.execute<{ item_id: string; id: string }>(sql`
+		select item_id, id from (
+			select ${instance.itemId} as item_id, ${instance.id} as id,
+				row_number() over (partition by ${instance.itemId} order by ${instance.sortKey}) as position,
+				count(*) over (partition by ${instance.itemId}) as total
+			from ${instance}
+			where ${inArray(instance.itemId, itemIds)}
+		) ranked
+		where position = total / 2 + 1
+	`);
+	return new Map(rows.map((r) => [r.item_id, r.id]));
 }
 
 /** All items visible to the current admin or viewer, grouped for display. */
@@ -89,7 +125,7 @@ export async function listCatalog(locals: App.Locals): Promise<CatalogProject[]>
 		})
 		.from(item)
 		.innerJoin(project, eq(project.id, item.projectId))
-		.where(accessFilter(locals))
-		.orderBy(asc(project.name), asc(item.seriesNumber), asc(item.label));
-	return groupCatalog(rows);
+		.where(accessFilter(locals));
+	const thumbnails = await middleInstances(rows.filter((r) => r.kind === 'image').map((r) => r.id));
+	return groupCatalog(rows, thumbnails);
 }

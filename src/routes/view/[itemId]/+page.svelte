@@ -21,7 +21,12 @@
 <svelte:head><title>{item.label} · Scans</title></svelte:head>
 
 <div class="flex shrink-0 items-center gap-3 border-b px-2 py-2">
-	<Button variant="ghost" size="icon" href={resolve('/view')} aria-label="Back to all scans">
+	<Button
+		variant="ghost"
+		size="icon"
+		href={resolve('/view/projects/[projectId]', { projectId: item.projectId })}
+		aria-label="Back to all scans"
+	>
 		<ArrowLeftIcon />
 	</Button>
 	<div class="min-w-0">

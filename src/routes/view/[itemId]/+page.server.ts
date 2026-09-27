@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		item: {
 			id: row.id,
+			projectId: row.projectId,
 			kind: row.kind,
 			label: row.label,
 			modality: row.modality,

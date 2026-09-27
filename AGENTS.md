@@ -37,6 +37,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Stack viewports do not apply the stored VOI automatically. Use `defaultVoiRange`.
 - The 3D viewport is attached only after the volume has finished loading, so it is not re-rendered for every slice.
 - 3D views rotate as turntables around patient superior (+Z in DICOM/STL coordinates): `TurntableRotateTool` for Cornerstone, and `camera.up` set before constructing `OrbitControls` for STL. Do not switch back to `TrackballRotateTool`, which accumulates roll.
+- Overview thumbnails (`src/lib/viewer/thumbnails.ts`) use `loadImageToCanvas` with `useCPURendering: true`. Its GPU path shares one hidden rendering engine and stalls under concurrent calls.
 - Use unique IDs for rendering engines and tool groups for each mount. On destroy, clean up with `cache.purgeCache()` and `clearInstanceMetadata()`.
 
 ## Svelte and UI
