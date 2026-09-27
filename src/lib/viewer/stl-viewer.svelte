@@ -50,6 +50,8 @@
 		const controls = new OrbitControls(camera, renderer.domElement);
 		// Match the Cornerstone 3D view: middle button pans, right button zooms.
 		controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.DOLLY };
+		// Slower than the default, matching the Cornerstone 3D view.
+		controls.rotateSpeed = 0.6;
 		const material = new MeshStandardMaterial({ color: 0xe8e2d6, roughness: 0.6, metalness: 0 });
 		let bounds = new Sphere(new Vector3(), 1);
 		let frame = 0;

@@ -3,7 +3,7 @@ import { BaseTool, type Types as ToolTypes } from '@cornerstonejs/tools';
 
 /** Patient superior direction in DICOM (LPS) world coordinates. */
 const WORLD_UP: Types.Point3 = [0, 0, 1];
-const RADIANS_PER_PIXEL = 0.01;
+const RADIANS_PER_PIXEL = 0.006;
 /** Pitch stays just short of straight up/down, where the view-up vector is undefined. */
 const MAX_PITCH = (89 * Math.PI) / 180;
 
