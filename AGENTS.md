@@ -39,7 +39,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - 3D rendering cost scales with ray sample distance × canvas pixels. `adaptiveVolumeQuality` renders with 3× coarser sampling while the pointer is down or the wheel moves, then renders once at full quality. Volume textures are 16-bit (`preferSizeOverAccuracy`).
 - 3D views rotate as turntables around patient superior (+Z in DICOM/STL coordinates): `TurntableRotateTool` (a `BaseTool`, so it does not reset the camera on resize like the trackball) for Cornerstone, and `camera.up` set before constructing `OrbitControls` for STL. Do not switch back to `TrackballRotateTool`, which accumulates roll.
 - Overview thumbnails (`src/lib/viewer/thumbnails.ts`) use `loadImageToCanvas` with `useCPURendering: true`. Its GPU path shares one hidden rendering engine and stalls under concurrent calls.
-- Use unique IDs for rendering engines and tool groups for each mount. On destroy, clean up with `cache.purgeCache()` and `clearInstanceMetadata()`.
+- Use unique IDs for rendering engines and tool groups for each mount. On destroy, call `destroyRenderingEngine` (not `engine.destroy()`, which leaves the WebGL context and its volume texture alive until the browser evicts it), then `cache.purgeCache()` and `clearInstanceMetadata()`.
 
 ## Svelte and UI
 
