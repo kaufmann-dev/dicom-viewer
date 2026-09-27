@@ -1,0 +1,12 @@
+packages:
+  - .
+
+allowBuilds:
+  core-js-pure: false
+  esbuild: true
+
+# vtk.js (used by Cornerstone3D) bundles xmlbuilder2, which imports Node's `events` module.
+packageExtensions:
+  xmlbuilder2:
+    dependencies:
+      events: ^3.3.0
