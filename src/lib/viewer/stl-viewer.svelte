@@ -19,6 +19,10 @@
 	import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 	import { Button } from '$lib/components/ui/button';
 	import { Progress } from '$lib/components/ui/progress';
+	import { FIELD_SURFACE } from '$lib/components/field-surface';
+	import { Toggle } from '$lib/components/ui/toggle';
+	import { cn } from '$lib/utils';
+	import MouseHint from './mouse-hint.svelte';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
 
 	let { instanceId }: { instanceId: string } = $props();
@@ -127,26 +131,31 @@
 </script>
 
 <div
-	class="flex shrink-0 flex-wrap items-center gap-1 border-b px-2 py-1"
+	class="flex shrink-0 flex-wrap items-center gap-2 border-b bg-background px-2 py-1.5"
 	role="toolbar"
 	aria-label="Model tools"
 >
-	<Button variant="ghost" size="sm" onclick={() => resetView()}><RotateCcwIcon />Reset view</Button>
-	<Button
-		variant={wireframe ? 'default' : 'ghost'}
+	<Toggle
 		size="sm"
-		aria-pressed={wireframe}
-		onclick={() => {
-			wireframe = !wireframe;
-			setWireframe(wireframe);
-		}}
+		class={cn(
+			FIELD_SURFACE,
+			'aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary aria-pressed:hover:text-primary-foreground'
+		)}
+		bind:pressed={
+			() => wireframe,
+			(value) => {
+				wireframe = value;
+				setWireframe(value);
+			}
+		}
 	>
 		Wireframe
+	</Toggle>
+	<Button variant="ghost" size="sm" class="sm:ml-auto" onclick={() => resetView()}>
+		<RotateCcwIcon />Reset view
 	</Button>
 </div>
-<p class="shrink-0 border-b px-3 py-1 text-xs text-muted-foreground pointer-coarse:hidden">
-	{MOUSE_HINTS_3D}
-</p>
+<MouseHint text={MOUSE_HINTS_3D} />
 
 <div class="relative min-h-0 flex-1 bg-black">
 	<div class="h-full w-full overflow-hidden" bind:this={container}>

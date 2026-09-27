@@ -15,6 +15,7 @@
 	import * as Segmented from '$lib/components/segmented';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
+	import MouseHint from './mouse-hint.svelte';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
 
 	let {
@@ -78,7 +79,7 @@
 	{#if presets.length && onPreset}
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
-				class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), FIELD_SURFACE)}
+				class={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), FIELD_SURFACE)}
 			>
 				<ContrastIcon />Window preset<ChevronDownIcon class="text-muted-foreground" />
 			</DropdownMenu.Trigger>
@@ -99,8 +100,4 @@
 		<Button variant="ghost" size="sm" onclick={onReset}><RotateCcwIcon />Reset</Button>
 	</div>
 </div>
-<p
-	class="shrink-0 border-b bg-background px-3 py-1 text-xs text-muted-foreground pointer-coarse:hidden"
->
-	{PRIMARY_TOOL_HINTS[primary]} · {MOUSE_HINTS_2D}
-</p>
+<MouseHint text="{PRIMARY_TOOL_HINTS[primary]} · {MOUSE_HINTS_2D}" />

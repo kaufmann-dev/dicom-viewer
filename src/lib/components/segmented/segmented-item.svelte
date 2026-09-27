@@ -10,7 +10,7 @@
 <ToggleGroup.Item
 	class={cn(
 		FIELD_SURFACE,
-		'not-last:not-data-[state=on]:border-r-border group-data-[spacing=0]/toggle-group:px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary',
+		'not-last:not-data-[state=on]:border-r-border group-data-[spacing=0]/toggle-group:px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary data-[state=on]:hover:text-primary-foreground',
 		className
 	)}
 	{...restProps}

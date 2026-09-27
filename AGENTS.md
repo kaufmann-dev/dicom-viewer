@@ -51,7 +51,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Use the Svelte MCP (`list-sections`, `get-documentation`, `svelte-autofixer`) when writing Svelte code.
 - Import shadcn-svelte components from `$lib/components/ui/`. Never run the shadcn CLI to add or remove components. Those files are excluded from Prettier and ESLint.
 - Build single-choice option groups with `$lib/components/segmented`, not raw `ToggleGroup`. It keeps one option selected and gives every group the same look.
-- Give controls that act like form fields (segments, select-style menu triggers) the input surface from `$lib/components/field-surface`, not the outline button style.
+- Give controls that act like form fields (segments, toggles, select-style menu triggers) the input surface from `$lib/components/field-surface`, not the outline button style. Selected items use the primary fill, including on hover.
 - Keep the visual rules in `src/routes/layout.css`: softly rounded corners, muted cool-neutral surfaces instead of pure black/white, and shadcn's default subtle shadows and transitions. Imaging viewports stay pure black.
 - Build internal links with `resolve()` from `$app/paths`, as ESLint enforces.
 - The login page (`src/routes/+page.svelte`) is the only public page and the only place for the Imprint and Privacy links.

@@ -250,7 +250,7 @@
 	</Segmented.Root>
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger
-			class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), FIELD_SURFACE)}
+			class={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), FIELD_SURFACE)}
 			disabled={!vrReady}
 			aria-label="3D preset: {vrPreset}"
 		>
