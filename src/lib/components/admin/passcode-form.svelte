@@ -97,7 +97,13 @@
 		</div>
 		<div class="flex flex-col gap-2">
 			<Label for="passcode-expiry">Expires</Label>
-			<Input id="passcode-expiry" type="datetime-local" bind:value={expiresLocal} required />
+			<Input
+				id="passcode-expiry"
+				type="datetime-local"
+				class="appearance-none [&::-webkit-date-and-time-value]:text-left"
+				bind:value={expiresLocal}
+				required
+			/>
 			<div class="flex gap-1">
 				{#each [7, 30, 90] as days (days)}
 					<Button
@@ -112,7 +118,7 @@
 		</div>
 	</div>
 
-	<fieldset class="mt-6 flex min-h-0 flex-1 flex-col border-t">
+	<fieldset class="mt-6 flex min-h-0 min-w-0 flex-1 flex-col border-t">
 		<legend class="sr-only">Shared items</legend>
 		<div class="flex items-center justify-between px-4 py-3">
 			<span class="text-sm font-medium">Shared items ({selected.size})</span>
