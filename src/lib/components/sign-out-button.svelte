@@ -15,11 +15,13 @@
 </script>
 
 {#if role === 'admin'}
-	<Button variant="ghost" size="sm" disabled={pending} onclick={adminSignOut}>
-		<LogOutIcon />Sign out
+	<Button variant="ghost" size="sm" disabled={pending} onclick={adminSignOut} aria-label="Sign out">
+		<LogOutIcon /><span class="hidden sm:inline">Sign out</span>
 	</Button>
 {:else}
 	<form method="POST" action="/logout">
-		<Button type="submit" variant="ghost" size="sm"><LogOutIcon />Sign out</Button>
+		<Button type="submit" variant="ghost" size="sm" aria-label="Sign out"
+			><LogOutIcon /><span class="hidden sm:inline">Sign out</span></Button
+		>
 	</form>
 {/if}
