@@ -8,7 +8,9 @@
 	import RulerIcon from '@lucide/svelte/icons/ruler';
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
+	import { FIELD_SURFACE } from '$lib/components/field-surface';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { cn } from '$lib/utils';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Segmented from '$lib/components/segmented';
 	import * as Tooltip from '$lib/components/ui/tooltip';
@@ -75,7 +77,9 @@
 
 	{#if presets.length && onPreset}
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class={buttonVariants({ variant: 'outline', size: 'sm' })}>
+			<DropdownMenu.Trigger
+				class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), FIELD_SURFACE)}
+			>
 				<ContrastIcon />Window preset<ChevronDownIcon class="text-muted-foreground" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="min-w-60">

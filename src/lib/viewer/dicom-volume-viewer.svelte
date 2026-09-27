@@ -16,7 +16,9 @@
 	import BoxIcon from '@lucide/svelte/icons/box';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
+	import { FIELD_SURFACE } from '$lib/components/field-surface';
 	import { buttonVariants } from '$lib/components/ui/button';
+	import { cn } from '$lib/utils';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Slider } from '$lib/components/ui/slider';
 	import {
@@ -248,7 +250,7 @@
 	</Segmented.Root>
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger
-			class={buttonVariants({ variant: 'outline', size: 'sm' })}
+			class={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), FIELD_SURFACE)}
 			disabled={!vrReady}
 			aria-label="3D preset: {vrPreset}"
 		>
