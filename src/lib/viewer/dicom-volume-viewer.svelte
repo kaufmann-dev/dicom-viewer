@@ -110,10 +110,11 @@
 			]);
 
 			const volume = await volumeLoader.createAndCacheVolume(volumeId, { imageIds });
+			if (destroyed) return;
 			// The 3D view joins once every slice is decoded; re-rendering it for each
 			// progressively loaded slice would dominate the loading time.
 			volume.load(() => {
-				if (!destroyed) void attach3d();
+				if (!destroyed) void attach3d().catch(reportError);
 			});
 			await setVolumesForViewports(engine, [{ volumeId }], orthoIds);
 			if (destroyed) return;
@@ -129,7 +130,7 @@
 
 			resizeObserver.observe(container);
 			engine.render();
-			phase = 'ready';
+			if (phase !== 'error') phase = 'ready';
 		}
 
 		async function attach3d() {
@@ -143,10 +144,12 @@
 			);
 		}
 
-		start().catch((error) => {
+		function reportError(error: unknown) {
 			console.error(error);
 			if (!destroyed) phase = 'error';
-		});
+		}
+
+		start().catch(reportError);
 
 		return () => {
 			destroyed = true;

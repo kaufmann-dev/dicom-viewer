@@ -10,3 +10,7 @@ packageExtensions:
   xmlbuilder2:
     dependencies:
       events: ^3.3.0
+
+patchedDependencies:
+  '@cornerstonejs/core@5.11.0': patches/@cornerstonejs__core@5.11.0.patch
+  '@kitware/vtk.js@36.4.1': patches/@kitware__vtk.js@36.4.1.patch
