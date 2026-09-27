@@ -213,20 +213,24 @@
 	onPreset={applyWindow}
 	onReset={reset}
 >
-	<span class="mx-1 h-5 w-px bg-border" aria-hidden="true"></span>
-	<ToggleGroup.Root
-		type="single"
-		size="sm"
-		value={layout}
-		onValueChange={changeLayout}
-		aria-label="Layout"
-	>
-		<ToggleGroup.Item value="grid">All</ToggleGroup.Item>
-		{#each PANES as pane (pane.id)}
-			<ToggleGroup.Item value={pane.id}>{pane.label}</ToggleGroup.Item>
-		{/each}
-	</ToggleGroup.Root>
-	<span class="mx-1 h-5 w-px bg-border" aria-hidden="true"></span>
+	<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
+	<div class="flex items-center gap-2">
+		<span class="text-xs text-muted-foreground" id="{uid}-layout-label">Layout</span>
+		<ToggleGroup.Root
+			type="single"
+			size="sm"
+			variant="outline"
+			value={layout}
+			onValueChange={changeLayout}
+			aria-labelledby="{uid}-layout-label"
+		>
+			<ToggleGroup.Item value="grid">All</ToggleGroup.Item>
+			{#each PANES as pane (pane.id)}
+				<ToggleGroup.Item value={pane.id}>{pane.label}</ToggleGroup.Item>
+			{/each}
+		</ToggleGroup.Root>
+	</div>
+	<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
 	<label class="flex items-center gap-2 text-xs text-muted-foreground">
 		3D preset
 		<NativeSelect size="sm" bind:value={vrPreset} onchange={applyVrPreset} disabled={!vrReady}>

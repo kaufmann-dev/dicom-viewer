@@ -7,6 +7,7 @@
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
@@ -28,6 +29,8 @@
 		onReset: () => void;
 		children?: Snippet;
 	} = $props();
+
+	const id = $props.id();
 
 	const icons = {
 		crosshairs: CrosshairIcon,
@@ -64,15 +67,20 @@
 	</Tooltip.Provider>
 
 	{#if presets.length && onPreset}
-		<span class="mx-1 h-5 w-px bg-border" aria-hidden="true"></span>
-		<div class="flex items-center gap-1" role="group" aria-label="Window presets">
-			{#each presets as preset (preset.label)}
-				<Button variant="ghost" size="sm" onclick={() => onPreset(preset)}>{preset.label}</Button>
-			{/each}
+		<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
+		<div class="flex items-center gap-2">
+			<span class="text-xs text-muted-foreground" id="{id}-window-label">Window</span>
+			<ButtonGroup aria-labelledby="{id}-window-label">
+				{#each presets as preset (preset.label)}
+					<Button variant="outline" size="sm" onclick={() => onPreset(preset)}
+						>{preset.label}</Button
+					>
+				{/each}
+			</ButtonGroup>
 		</div>
 	{/if}
 
-	<span class="mx-1 h-5 w-px bg-border" aria-hidden="true"></span>
+	<span class="mx-1 h-5 w-px bg-border max-sm:hidden" aria-hidden="true"></span>
 	<Button variant="ghost" size="sm" onclick={onReset}><RotateCcwIcon />Reset</Button>
 	{@render children?.()}
 </div>
