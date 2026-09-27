@@ -63,7 +63,8 @@ Uploaded files are stored under `DATA_DIR` (`./data` locally). The database only
 2. Under **Projects**, create a project and choose a folder or files, or drag them onto the
    upload area. Uploading a folder twice, or overlapping folders, skips instances that are
    already stored.
-3. Under **Passcodes**, create a passcode. Give it a label and an expiry, then select the items
+3. Under **Passcodes**, create a passcode. Give it a label, a code of your choice (at least six
+   letters or digits; case, spaces and dashes are ignored) and an expiry, then select the items
    it may open. Checking a project selects all of its items.
 4. Share the site link and the code. The code works until it expires. Editing a passcode's items,
    or deleting the passcode, takes effect immediately, including for viewers who are already

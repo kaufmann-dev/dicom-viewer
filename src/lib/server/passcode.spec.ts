@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
 	FailureLimiter,
-	generateCode,
 	normalizeCode,
 	safeReturnTo,
 	VIEWER_SESSION_MAX_MS,
@@ -9,11 +8,6 @@ import {
 } from './passcode';
 
 describe('passcodes', () => {
-	it('generates unambiguous 10-character codes', () => {
-		const code = generateCode();
-		expect(code).toMatch(/^[A-HJ-NP-Z2-9]{10}$/);
-	});
-
 	it('normalizes typed codes', () => {
 		expect(normalizeCode(' abcd-efgh 23 ')).toBe('ABCDEFGH23');
 	});

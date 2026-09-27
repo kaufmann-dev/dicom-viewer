@@ -1,16 +1,4 @@
-import { randomInt } from 'node:crypto';
-
-/** Crockford-style alphabet without the ambiguous characters 0, 1, I and O. */
-const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const CODE_LENGTH = 10;
-
 export const VIEWER_SESSION_MAX_MS = 7 * 24 * 60 * 60 * 1000;
-
-export function generateCode(): string {
-	let code = '';
-	for (let i = 0; i < CODE_LENGTH; i++) code += ALPHABET[randomInt(ALPHABET.length)];
-	return code;
-}
 
 /** Accepts codes typed with lowercase letters, spaces or dashes. */
 export function normalizeCode(input: string): string {

@@ -120,7 +120,7 @@
 		<Sheet.Header>
 			<Sheet.Title>{editing ? 'Edit passcode' : 'New passcode'}</Sheet.Title>
 			<Sheet.Description>
-				{editing ? `Code ${editing.code}` : 'A random code is generated when you create it.'}
+				{editing ? editing.label : 'Choose a code and the items it opens.'}
 			</Sheet.Description>
 		</Sheet.Header>
 		{#key editingId}

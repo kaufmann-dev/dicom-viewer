@@ -15,7 +15,13 @@
 		onSaved
 	}: {
 		catalog: CatalogProject[];
-		passcode: { id: string; label: string; expiresAt: Date; itemIds: string[] } | null;
+		passcode: {
+			id: string;
+			label: string;
+			code: string;
+			expiresAt: Date;
+			itemIds: string[];
+		} | null;
 		onSaved: () => void;
 	} = $props();
 
@@ -29,6 +35,7 @@
 	// The form is created fresh for each passcode being edited, so the props are read once.
 	const initial = (() => passcode)();
 	let label = $state(initial?.label ?? '');
+	let code = $state(initial?.code ?? '');
 	let expiresLocal = $state(toLocalInput(initial?.expiresAt ?? new Date(Date.now() + 30 * DAY)));
 	const selected = new SvelteSet<string>(initial?.itemIds ?? []);
 	let error = $state('');
@@ -94,6 +101,24 @@
 				placeholder="e.g. Dr. Müller, orthopedics"
 				required
 			/>
+		</div>
+		<div class="flex flex-col gap-2">
+			<Label for="passcode-code">Code</Label>
+			<Input
+				id="passcode-code"
+				name="code"
+				bind:value={code}
+				required
+				minlength={6}
+				autocomplete="off"
+				autocapitalize="characters"
+				spellcheck={false}
+				class="font-mono tracking-widest uppercase"
+				aria-describedby="passcode-code-hint"
+			/>
+			<p id="passcode-code-hint" class="text-xs text-muted-foreground">
+				At least 6 letters or digits. Case, spaces and dashes are ignored.
+			</p>
 		</div>
 		<div class="flex flex-col gap-2">
 			<Label for="passcode-expiry">Expires</Label>
