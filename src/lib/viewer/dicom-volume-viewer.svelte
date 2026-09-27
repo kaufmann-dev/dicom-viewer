@@ -32,19 +32,19 @@
 	} from './cornerstone';
 	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
+	import { SEGMENTED_GROUP, SEGMENTED_ITEM } from './segmented';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
 
 	type Pane = 'axial' | 'sagittal' | 'coronal' | '3d';
+	type Layout = 'grid' | Pane;
 	const PANES: { id: Pane; label: string }[] = [
 		{ id: 'axial', label: 'Axial' },
 		{ id: 'sagittal', label: 'Sagittal' },
 		{ id: 'coronal', label: 'Coronal' },
 		{ id: '3d', label: '3D' }
 	];
-	const LAYOUT_ITEM =
-		'text-muted-foreground hover:bg-transparent data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm';
 	const TOOLS: PrimaryTool[] = ['crosshairs', 'windowLevel', 'pan', 'zoom', 'length'];
 	const VR_PRESETS = $derived(
 		CONSTANTS.VIEWPORT_PRESETS.map((p) => p.name).filter((name) =>
@@ -70,7 +70,7 @@
 	let phase: 'downloading' | 'ready' | 'error' = $state('downloading');
 	let loaded = $state(0);
 	let primary: PrimaryTool = $state('crosshairs');
-	let layout: 'grid' | Pane = $state('grid');
+	let layout: Layout = $state('grid');
 	// The page re-creates this component per item, so the initial modality is sufficient.
 	let vrReady = $state(false);
 	let vrPreset = $state(untrack(() => (modality === 'MR' ? 'MR-Default' : 'CT-Bone')));
@@ -204,8 +204,8 @@
 		engine.render();
 	}
 
-	async function changeLayout(value: string) {
-		layout = (value || 'grid') as typeof layout;
+	async function changeLayout(value: Layout) {
+		layout = value;
 		await tick();
 		engine?.resize(true, false);
 	}
@@ -223,14 +223,13 @@
 		type="single"
 		size="sm"
 		spacing={1}
-		value={layout}
-		onValueChange={changeLayout}
+		bind:value={() => layout, (value) => value && changeLayout(value as Layout)}
 		aria-label="Layout"
-		class="rounded-2xl bg-muted p-0.5"
+		class={SEGMENTED_GROUP}
 	>
-		<ToggleGroup.Item value="grid" class={LAYOUT_ITEM}><LayoutGridIcon />All</ToggleGroup.Item>
+		<ToggleGroup.Item value="grid" class={SEGMENTED_ITEM}><LayoutGridIcon />All</ToggleGroup.Item>
 		{#each PANES as pane (pane.id)}
-			<ToggleGroup.Item value={pane.id} class={LAYOUT_ITEM}>{pane.label}</ToggleGroup.Item>
+			<ToggleGroup.Item value={pane.id} class={SEGMENTED_ITEM}>{pane.label}</ToggleGroup.Item>
 		{/each}
 	</ToggleGroup.Root>
 	<DropdownMenu.Root>

@@ -9,11 +9,12 @@
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { ButtonGroup } from '$lib/components/ui/button-group';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
+	import { SEGMENTED_GROUP, SEGMENTED_ITEM } from './segmented';
 
 	let {
 		tools,
@@ -49,26 +50,30 @@
 	aria-label="Viewer tools"
 >
 	<Tooltip.Provider>
-		<ButtonGroup aria-label="Left mouse button tool">
+		<ToggleGroup.Root
+			type="single"
+			size="sm"
+			spacing={1}
+			bind:value={() => primary, (value) => value && onPrimary(value as PrimaryTool)}
+			aria-label="Left mouse button tool"
+			class={SEGMENTED_GROUP}
+		>
 			{#each tools as tool (tool)}
 				{@const Icon = icons[tool]}
 				<Tooltip.Root>
-					<Tooltip.Trigger
-						class={buttonVariants({
-							variant: primary === tool ? 'default' : 'outline',
-							size: 'sm'
-						})}
-						aria-pressed={primary === tool}
-						onclick={() => onPrimary(tool)}
-					>
-						<Icon />
-						<span class="hidden md:inline">{PRIMARY_TOOL_LABELS[tool]}</span>
-						<span class="sr-only md:hidden">{PRIMARY_TOOL_LABELS[tool]}</span>
+					<Tooltip.Trigger>
+						{#snippet child({ props })}
+							<ToggleGroup.Item {...props} value={tool} class={SEGMENTED_ITEM}>
+								<Icon />
+								<span class="hidden md:inline">{PRIMARY_TOOL_LABELS[tool]}</span>
+								<span class="sr-only md:hidden">{PRIMARY_TOOL_LABELS[tool]}</span>
+							</ToggleGroup.Item>
+						{/snippet}
 					</Tooltip.Trigger>
 					<Tooltip.Content>{PRIMARY_TOOL_HINTS[tool]}</Tooltip.Content>
 				</Tooltip.Root>
 			{/each}
-		</ButtonGroup>
+		</ToggleGroup.Root>
 	</Tooltip.Provider>
 
 	{#if presets.length && onPreset}
