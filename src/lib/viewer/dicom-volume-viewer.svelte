@@ -32,7 +32,7 @@
 	} from './cornerstone';
 	import { adaptiveVolumeQuality } from './adaptive-volume-quality';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
-	import { SEGMENTED_GROUP, SEGMENTED_ITEM } from './segmented';
+	import { SEGMENTED_ITEM } from './segmented';
 	import ViewerToolbar from './viewer-toolbar.svelte';
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
@@ -221,11 +221,10 @@
 >
 	<ToggleGroup.Root
 		type="single"
-		size="sm"
-		spacing={1}
+		size="default"
+		variant="outline"
 		bind:value={() => layout, (value) => value && changeLayout(value as Layout)}
 		aria-label="Layout"
-		class={SEGMENTED_GROUP}
 	>
 		<ToggleGroup.Item value="grid" class={SEGMENTED_ITEM}><LayoutGridIcon />All</ToggleGroup.Item>
 		{#each PANES as pane (pane.id)}

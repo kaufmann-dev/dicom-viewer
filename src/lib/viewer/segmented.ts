@@ -1,4 +1,3 @@
-/** Shared look for single-choice groups: a muted track with the selected item filled. */
-export const SEGMENTED_GROUP = 'rounded-2xl bg-muted p-0.5';
+/** Shared look for single-choice toggle groups (`variant="outline"`): muted segments, selected one filled. */
 export const SEGMENTED_ITEM =
-	'text-muted-foreground hover:bg-transparent data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-sm';
+	'bg-muted group-data-[spacing=0]/toggle-group:px-3 hover:bg-muted/60 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground';

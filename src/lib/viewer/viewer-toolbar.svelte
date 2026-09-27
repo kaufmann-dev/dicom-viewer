@@ -14,7 +14,7 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';
-	import { SEGMENTED_GROUP, SEGMENTED_ITEM } from './segmented';
+	import { SEGMENTED_ITEM } from './segmented';
 
 	let {
 		tools,
@@ -52,11 +52,10 @@
 	<Tooltip.Provider>
 		<ToggleGroup.Root
 			type="single"
-			size="sm"
-			spacing={1}
+			size="default"
+			variant="outline"
 			bind:value={() => primary, (value) => value && onPrimary(value as PrimaryTool)}
 			aria-label="Left mouse button tool"
-			class={SEGMENTED_GROUP}
 		>
 			{#each tools as tool (tool)}
 				{@const Icon = icons[tool]}
