@@ -10,7 +10,7 @@
 		volumeLoader,
 		type Types
 	} from '@cornerstonejs/core';
-	import { ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
+	import { CrosshairsTool, ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
 	import { Progress } from '$lib/components/ui/progress';
 	import * as Segmented from '$lib/components/segmented';
 	import BoxIcon from '@lucide/svelte/icons/box';
@@ -50,7 +50,7 @@
 		{ id: 'coronal', label: 'Coronal' },
 		{ id: '3d', label: '3D' }
 	];
-	const TOOLS: PrimaryTool[] = ['crosshairs', 'windowLevel', 'pan', 'zoom', 'length'];
+	const TOOLS: PrimaryTool[] = ['crosshairs', 'scroll', 'windowLevel', 'pan', 'zoom', 'length'];
 	const VR_PRESETS = $derived(
 		CONSTANTS.VIEWPORT_PRESETS.map((p) => p.name).filter((name) =>
 			modality === 'MR' ? name.startsWith('MR') : name.startsWith('CT')
@@ -79,6 +79,9 @@
 	// Phones are too small for four panes, so they show a single pane instead of "All".
 	const isMobile = new IsMobile();
 	const shownLayout: Layout = $derived(isMobile.current && layout === 'grid' ? 'axial' : layout);
+	// Crosshairs only help when the other planes are visible, so single panes drop them.
+	const tools = $derived(shownLayout === 'grid' ? TOOLS : TOOLS.filter((t) => t !== 'crosshairs'));
+	const activePrimary = $derived(tools.includes(primary) ? primary : 'scroll');
 	// The page re-creates this component per item, so the initial modality is sufficient.
 	let vrReady = $state(false);
 	let vrPreset = $state(untrack(() => (modality === 'MR' ? 'MR-Default' : 'CT-Bone')));
@@ -141,7 +144,7 @@
 			mprGroup = ToolGroupManager.createToolGroup(mprGroupId)!;
 			addViewingTools(mprGroup, TOOLS);
 			for (const id of orthoIds) mprGroup.addViewport(id, engineId);
-			applyToolBindings(mprGroup, TOOLS, primary);
+			applyMprTools(mprGroup, tools, activePrimary);
 
 			const vrGroup = ToolGroupManager.createToolGroup(vrGroupId)!;
 			add3dTools(vrGroup);
@@ -187,10 +190,18 @@
 		return orthoIds.map((id) => engine!.getViewport(id) as Types.IVolumeViewport);
 	}
 
-	function selectTool(tool: PrimaryTool) {
-		primary = tool;
-		if (mprGroup) applyToolBindings(mprGroup, TOOLS, tool);
+	/** Binds the tools; disabling the crosshairs also removes their lines. */
+	function applyMprTools(group: ToolTypes.IToolGroup, available: PrimaryTool[], tool: PrimaryTool) {
+		applyToolBindings(group, available, tool);
+		if (!available.includes('crosshairs')) group.setToolDisabled(CrosshairsTool.toolName);
 	}
+
+	$effect(() => {
+		// Read both before the group check, so the effect tracks them before the group exists.
+		const available = tools;
+		const tool = activePrimary;
+		if (mprGroup) applyMprTools(mprGroup, available, tool);
+	});
 
 	function applyWindow(preset: WindowPreset) {
 		if (!engine) return;
@@ -234,9 +245,9 @@
 </script>
 
 <ViewerToolbar
-	tools={TOOLS}
-	{primary}
-	onPrimary={selectTool}
+	{tools}
+	primary={activePrimary}
+	onPrimary={(tool) => (primary = tool)}
 	presets={modality === 'CT' ? CT_WINDOW_PRESETS : []}
 	onPreset={applyWindow}
 	onReset={reset}

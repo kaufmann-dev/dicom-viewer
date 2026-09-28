@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { cache, Enums, RenderingEngine, type Types } from '@cornerstonejs/core';
 	import { ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
 	import { Slider } from '$lib/components/ui/slider';
@@ -20,7 +20,12 @@
 
 	let { instanceIds, modality }: { instanceIds: string[]; modality: string | null } = $props();
 
-	const TOOLS: PrimaryTool[] = ['windowLevel', 'pan', 'zoom', 'length'];
+	// The page re-creates this component per item, so the initial instance count is sufficient.
+	const TOOLS: PrimaryTool[] = untrack(() =>
+		instanceIds.length > 1
+			? ['scroll', 'windowLevel', 'pan', 'zoom', 'length']
+			: ['windowLevel', 'pan', 'zoom', 'length']
+	);
 	const uid = crypto.randomUUID();
 	const engineId = `engine-${uid}`;
 	const viewportId = `stack-${uid}`;

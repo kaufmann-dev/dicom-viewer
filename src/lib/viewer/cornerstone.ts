@@ -19,6 +19,14 @@ import {
 import { DicomOverlayTool } from './dicom-overlay-tool';
 import { TurntableRotateTool } from './turntable-rotate-tool';
 
+/**
+ * Two-finger pinch zoom (and pan) on touch screens. It needs its own name next to the zoom tool,
+ * which is configured to zoom on one-finger drags instead.
+ */
+class PinchZoomTool extends ZoomTool {
+	static toolName = 'PinchZoom';
+}
+
 let initialized = false;
 
 export function initCornerstone(): void {
@@ -32,6 +40,7 @@ export function initCornerstone(): void {
 		WindowLevelTool,
 		PanTool,
 		ZoomTool,
+		PinchZoomTool,
 		StackScrollTool,
 		LengthTool,
 		CrosshairsTool,
@@ -75,10 +84,11 @@ export function clearInstanceMetadata(): void {
 	metadataUtilities.clearCacheData();
 }
 
-export type PrimaryTool = 'crosshairs' | 'windowLevel' | 'pan' | 'zoom' | 'length';
+export type PrimaryTool = 'crosshairs' | 'scroll' | 'windowLevel' | 'pan' | 'zoom' | 'length';
 
 export const PRIMARY_TOOL_LABELS: Record<PrimaryTool, string> = {
 	crosshairs: 'Crosshairs',
+	scroll: 'Scroll',
 	windowLevel: 'Window / level',
 	pan: 'Pan',
 	zoom: 'Zoom',
@@ -87,6 +97,7 @@ export const PRIMARY_TOOL_LABELS: Record<PrimaryTool, string> = {
 
 const TOOL_NAMES: Record<PrimaryTool, string> = {
 	crosshairs: CrosshairsTool.toolName,
+	scroll: StackScrollTool.toolName,
 	windowLevel: WindowLevelTool.toolName,
 	pan: PanTool.toolName,
 	zoom: ZoomTool.toolName,
@@ -95,7 +106,10 @@ const TOOL_NAMES: Record<PrimaryTool, string> = {
 
 const { MouseBindings } = ToolEnums;
 
-/** Middle button pans, right button zooms and the wheel scrolls; the left button runs `primary`. */
+/**
+ * Middle button pans, right button zooms and the wheel scrolls; the left button (or one finger)
+ * runs `primary`. Tools outside `tools` keep their bindings.
+ */
 export function applyToolBindings(
 	toolGroup: ToolTypes.IToolGroup,
 	tools: PrimaryTool[],
@@ -106,6 +120,7 @@ export function applyToolBindings(
 		if (tool === primary) bindings.push({ mouseButton: MouseBindings.Primary });
 		if (tool === 'pan') bindings.push({ mouseButton: MouseBindings.Auxiliary });
 		if (tool === 'zoom') bindings.push({ mouseButton: MouseBindings.Secondary });
+		if (tool === 'scroll') bindings.push({ mouseButton: MouseBindings.Wheel });
 		// setToolActive merges with previous bindings, so a former primary tool would keep the left button.
 		toolGroup.setToolPassive(TOOL_NAMES[tool], { removeAllBindings: true });
 		if (bindings.length) toolGroup.setToolActive(TOOL_NAMES[tool], { bindings });
@@ -113,11 +128,16 @@ export function applyToolBindings(
 }
 
 export function addViewingTools(toolGroup: ToolTypes.IToolGroup, tools: PrimaryTool[]): void {
-	for (const tool of tools) toolGroup.addTool(TOOL_NAMES[tool]);
-	toolGroup.addTool(StackScrollTool.toolName);
-	toolGroup.setToolActive(StackScrollTool.toolName, {
-		bindings: [{ mouseButton: MouseBindings.Wheel }]
-	});
+	for (const tool of tools) {
+		// With pinch-to-zoom, a one-finger drag pans, so the zoom tool would not zoom on touch.
+		toolGroup.addTool(TOOL_NAMES[tool], tool === 'zoom' ? { pinchToZoom: false } : undefined);
+	}
+	addPinchZoom(toolGroup);
+}
+
+function addPinchZoom(toolGroup: ToolTypes.IToolGroup): void {
+	toolGroup.addTool(PinchZoomTool.toolName);
+	toolGroup.setToolActive(PinchZoomTool.toolName, { bindings: [{ numTouchPoints: 2 }] });
 }
 
 export function add3dTools(toolGroup: ToolTypes.IToolGroup): void {
@@ -133,6 +153,7 @@ export function add3dTools(toolGroup: ToolTypes.IToolGroup): void {
 	toolGroup.setToolActive(ZoomTool.toolName, {
 		bindings: [{ mouseButton: MouseBindings.Secondary }, { mouseButton: MouseBindings.Wheel }]
 	});
+	addPinchZoom(toolGroup);
 }
 
 export type WindowPreset = { label: string; width: number; center: number };

@@ -4,6 +4,7 @@
 	import ContrastIcon from '@lucide/svelte/icons/contrast';
 	import CrosshairIcon from '@lucide/svelte/icons/crosshair';
 	import HandIcon from '@lucide/svelte/icons/hand';
+	import LayersIcon from '@lucide/svelte/icons/layers';
 	import RotateCcwIcon from '@lucide/svelte/icons/rotate-ccw';
 	import RulerIcon from '@lucide/svelte/icons/ruler';
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
@@ -39,6 +40,7 @@
 
 	const icons = {
 		crosshairs: CrosshairIcon,
+		scroll: LayersIcon,
 		windowLevel: SunMediumIcon,
 		pan: HandIcon,
 		zoom: ZoomInIcon,
