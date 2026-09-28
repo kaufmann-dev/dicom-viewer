@@ -76,11 +76,13 @@
 	let loaded = $state(0);
 	let primary: PrimaryTool = $state('crosshairs');
 	let layout: Layout = $state('grid');
-	// Phones are too small for four panes, so they show a single pane instead of "All".
+	// Phones are too small for four panes, so they offer single panes only.
 	const isMobile = new IsMobile();
 	const shownLayout: Layout = $derived(isMobile.current && layout === 'grid' ? 'axial' : layout);
 	// Crosshairs only help when the other planes are visible, so single panes drop them.
-	const tools = $derived(shownLayout === 'grid' ? TOOLS : TOOLS.filter((t) => t !== 'crosshairs'));
+	// Switching between single panes keeps the same tools, so the bindings are not reapplied.
+	const singlePane = $derived(shownLayout !== 'grid');
+	const tools = $derived(singlePane ? TOOLS.filter((t) => t !== 'crosshairs') : TOOLS);
 	const activePrimary = $derived(tools.includes(primary) ? primary : 'scroll');
 	// The page re-creates this component per item, so the initial modality is sufficient.
 	let vrReady = $state(false);
@@ -238,9 +240,12 @@
 	}
 
 	// Hiding or showing panes does not resize the container, so the observer does not notice it.
+	// Cornerstone skips resizing while a render is scheduled (tool changes schedule one), which
+	// would leave a pane that was attached while hidden blank, so resize on the next frame.
 	$effect(() => {
 		void shownLayout;
-		engine?.resize(true, false);
+		const frame = requestAnimationFrame(() => engine?.resize(true, false));
+		return () => cancelAnimationFrame(frame);
 	});
 </script>
 
@@ -258,7 +263,9 @@
 		onValueChange={(value) => (layout = value as Layout)}
 		aria-label="Layout"
 	>
-		<Segmented.Item value="grid" disabled={isMobile.current}><LayoutGridIcon />All</Segmented.Item>
+		{#if !isMobile.current}
+			<Segmented.Item value="grid"><LayoutGridIcon />All</Segmented.Item>
+		{/if}
 		{#each PANES as pane (pane.id)}
 			<Segmented.Item value={pane.id}>{pane.label}</Segmented.Item>
 		{/each}
