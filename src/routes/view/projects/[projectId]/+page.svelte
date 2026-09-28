@@ -251,8 +251,6 @@
 				</section>
 			{/each}
 		</div>
-		{#if data.role === 'viewer'}
-			<LegalLinks class="mt-6" />
-		{/if}
+		<LegalLinks class="mt-6" />
 	</main>
 </div>

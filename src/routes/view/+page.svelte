@@ -18,6 +18,4 @@
 	{/if}
 </p>
 
-{#if data.role === 'viewer'}
-	<LegalLinks class="mt-auto" />
-{/if}
+<LegalLinks class="mt-auto" />

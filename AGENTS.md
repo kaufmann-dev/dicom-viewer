@@ -56,4 +56,4 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 - Give controls that act like form fields (segments, toggles, select-style menu triggers) the input surface from `$lib/components/field-surface`, not the outline button style. Selected items use the primary fill, including on hover.
 - Keep the visual rules in `src/routes/layout.css`: softly rounded corners, muted cool-neutral surfaces instead of pure black/white, and shadcn's default subtle shadows and transitions. Imaging viewports stay pure black.
 - Build internal links with `resolve()` from `$app/paths`, as ESLint enforces.
-- The login page (`src/routes/+page.svelte`) is the only public page. The Imprint and Privacy links (`$lib/components/legal-links.svelte`) appear there and, for passcode viewers only, on the viewer overview (`/view`, `/view/projects/[projectId]`), not on item views or for admins.
+- The login page (`src/routes/+page.svelte`) is the only public page. The Imprint and Privacy links (`$lib/components/legal-links.svelte`) appear there and on the viewer overview (`/view`, `/view/projects/[projectId]`), not on item views or in `/admin`.
