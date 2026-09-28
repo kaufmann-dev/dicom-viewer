@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import LegalLinks from '$lib/components/legal-links.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -16,3 +17,7 @@
 		No scans are shared with this passcode.
 	{/if}
 </p>
+
+{#if data.role === 'viewer'}
+	<LegalLinks class="mt-auto" />
+{/if}

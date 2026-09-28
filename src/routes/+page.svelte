@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { authClient, OIDC_PROVIDER_ID } from '$lib/auth-client';
+	import LegalLinks from '$lib/components/legal-links.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -81,14 +82,5 @@
 			{/if}
 		</div>
 	</main>
-	<footer class="flex justify-center gap-6 px-4 py-6 text-xs text-muted-foreground">
-		<a
-			class="hover:text-foreground hover:underline"
-			href="https://legal.kaufmann.dev/imprint?site=scans.kaufmann.dev">Imprint</a
-		>
-		<a
-			class="hover:text-foreground hover:underline"
-			href="https://legal.kaufmann.dev/privacy?site=scans.kaufmann.dev">Privacy</a
-		>
-	</footer>
+	<LegalLinks />
 </div>

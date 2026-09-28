@@ -6,6 +6,7 @@
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import SearchIcon from '@lucide/svelte/icons/search';
+	import LegalLinks from '$lib/components/legal-links.svelte';
 	import ItemTile from '$lib/components/viewer/item-tile.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { downloadHref } from '$lib/download';
@@ -250,5 +251,8 @@
 				</section>
 			{/each}
 		</div>
+		{#if data.role === 'viewer'}
+			<LegalLinks class="mt-6" />
+		{/if}
 	</main>
 </div>
