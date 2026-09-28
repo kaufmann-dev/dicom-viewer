@@ -144,7 +144,7 @@ export function groupCatalog(
 	);
 }
 
-/** Middle instance (by slice order) of each image item. */
+/** Middle instance (by slice order) of each item; STL items have a single instance. */
 async function middleInstances(itemIds: string[]): Promise<Map<string, string>> {
 	if (itemIds.length === 0) return new Map();
 	const rows = await db.execute<{ item_id: string; id: string }>(sql`
@@ -181,6 +181,6 @@ export async function listCatalog(locals: App.Locals): Promise<CatalogProject[]>
 		.from(item)
 		.innerJoin(project, eq(project.id, item.projectId))
 		.where(accessFilter(locals));
-	const thumbnails = await middleInstances(rows.filter((r) => r.kind === 'image').map((r) => r.id));
+	const thumbnails = await middleInstances(rows.filter((r) => r.kind !== 'sr').map((r) => r.id));
 	return groupCatalog(rows, thumbnails);
 }

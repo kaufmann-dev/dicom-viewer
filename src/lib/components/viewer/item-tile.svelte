@@ -16,7 +16,8 @@
 	/** Loads the thumbnail once the tile scrolls into view. Cornerstone is browser-only. */
 	const lazyThumbnail: Attachment<HTMLElement> = (element) => {
 		const instanceId = item.thumbnailInstanceId;
-		if (!instanceId) return;
+		const kind = item.kind;
+		if (!instanceId || kind === 'sr') return;
 		let cancelled = false;
 		const observer = new IntersectionObserver(
 			async (entries) => {
@@ -24,7 +25,7 @@
 				observer.disconnect();
 				try {
 					const { loadThumbnail } = await import('$lib/viewer/thumbnails');
-					const url = await loadThumbnail(instanceId);
+					const url = await loadThumbnail(instanceId, kind);
 					if (!cancelled) src = url;
 				} catch {
 					if (!cancelled) failed = true;
@@ -40,7 +41,7 @@
 	};
 
 	const Icon = $derived(
-		item.kind === 'stl' ? BoxIcon : failed ? ImageOffIcon : item.volume ? LayersIcon : ImageIcon
+		failed ? ImageOffIcon : item.kind === 'stl' ? BoxIcon : item.volume ? LayersIcon : ImageIcon
 	);
 	const detail = $derived(
 		[itemTypeText(item), item.instanceCount > 1 ? `${item.instanceCount} images` : null]

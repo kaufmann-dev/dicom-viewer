@@ -3,6 +3,8 @@ import { clearInstanceMetadata, imageIdFor, initCornerstone } from './cornerston
 import { overlayBitmap, overlayPlanes } from './dicom-overlay';
 
 const SIZE = 320;
+
+export type ThumbnailKind = 'image' | 'stl';
 const CONCURRENCY = 4;
 
 /** Rendered thumbnails for this browser session, keyed by instance id. */
@@ -19,7 +21,11 @@ function next() {
 	job();
 }
 
-async function render(instanceId: string): Promise<string> {
+async function render(instanceId: string, kind: ThumbnailKind): Promise<string> {
+	if (kind === 'stl') {
+		const { renderStlThumbnail } = await import('./stl-thumbnail');
+		return renderStlThumbnail(instanceId, SIZE);
+	}
 	initCornerstone();
 	const canvas = document.createElement('canvas');
 	canvas.width = SIZE;
@@ -56,15 +62,15 @@ export function cachedThumbnail(instanceId: string): string | undefined {
 	return rendered.get(instanceId);
 }
 
-/** Renders the instance to a data URL, a few at a time, and remembers the result. */
-export function loadThumbnail(instanceId: string): Promise<string> {
+/** Renders the DICOM image or STL model to a data URL, a few at a time, and remembers the result. */
+export function loadThumbnail(instanceId: string, kind: ThumbnailKind): Promise<string> {
 	const known = rendered.get(instanceId);
 	if (known) return Promise.resolve(known);
 	let promise = pending.get(instanceId);
 	if (!promise) {
 		promise = new Promise<string>((resolve, reject) => {
 			queue.push(() => {
-				render(instanceId)
+				render(instanceId, kind)
 					.then((url) => {
 						rendered.set(instanceId, url);
 						resolve(url);

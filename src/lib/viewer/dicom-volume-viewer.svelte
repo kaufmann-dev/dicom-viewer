@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick, untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import {
 		cache,
 		CONSTANTS,
@@ -17,6 +17,7 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
 	import { FIELD_SURFACE } from '$lib/components/field-surface';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -75,6 +76,9 @@
 	let loaded = $state(0);
 	let primary: PrimaryTool = $state('crosshairs');
 	let layout: Layout = $state('grid');
+	// Phones are too small for four panes, so they show a single pane instead of "All".
+	const isMobile = new IsMobile();
+	const shownLayout: Layout = $derived(isMobile.current && layout === 'grid' ? 'axial' : layout);
 	// The page re-creates this component per item, so the initial modality is sufficient.
 	let vrReady = $state(false);
 	let vrPreset = $state(untrack(() => (modality === 'MR' ? 'MR-Default' : 'CT-Bone')));
@@ -222,11 +226,11 @@
 		engine.render();
 	}
 
-	async function changeLayout(value: Layout) {
-		layout = value;
-		await tick();
+	// Hiding or showing panes does not resize the container, so the observer does not notice it.
+	$effect(() => {
+		void shownLayout;
 		engine?.resize(true, false);
-	}
+	});
 </script>
 
 <ViewerToolbar
@@ -239,11 +243,11 @@
 >
 	<Segmented.Root
 		size="sm"
-		value={layout}
-		onValueChange={(value) => changeLayout(value as Layout)}
+		value={shownLayout}
+		onValueChange={(value) => (layout = value as Layout)}
 		aria-label="Layout"
 	>
-		<Segmented.Item value="grid"><LayoutGridIcon />All</Segmented.Item>
+		<Segmented.Item value="grid" disabled={isMobile.current}><LayoutGridIcon />All</Segmented.Item>
 		{#each PANES as pane (pane.id)}
 			<Segmented.Item value={pane.id}>{pane.label}</Segmented.Item>
 		{/each}
@@ -299,14 +303,14 @@
 	<div
 		class={[
 			'grid h-full w-full gap-px bg-neutral-800',
-			layout === 'grid' ? 'grid-cols-1 grid-rows-4 sm:grid-cols-2 sm:grid-rows-2' : 'grid-cols-1'
+			shownLayout === 'grid' ? 'grid-cols-2 grid-rows-2' : 'grid-cols-1'
 		]}
 	>
 		{#each PANES as pane (pane.id)}
 			<div
 				class={[
 					'relative min-h-0 min-w-0 bg-black',
-					layout !== 'grid' && layout !== pane.id && 'hidden'
+					shownLayout !== 'grid' && shownLayout !== pane.id && 'hidden'
 				]}
 			>
 				<div

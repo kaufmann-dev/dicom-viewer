@@ -9,7 +9,7 @@ export type CatalogItem = {
 	instanceCount: number;
 	volume: boolean;
 	seriesNumber: number | null;
-	/** Middle instance of an image series, used for its thumbnail. */
+	/** Middle instance of an image series, or the model of an STL item, used for its thumbnail. */
 	thumbnailInstanceId: string | null;
 };
 
