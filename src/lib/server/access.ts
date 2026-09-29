@@ -1,7 +1,13 @@
 import { and, asc, eq, inArray, ne, sql, type SQL } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { instance, item, passcodeItem, project } from '$lib/server/db/schema';
-import { itemOrder, type CatalogItem, type CatalogProject } from '$lib/catalog';
+import {
+	itemOrder,
+	type CatalogItem,
+	type CatalogProject,
+	type MissingThumbnail,
+	type ThumbnailRef
+} from '$lib/catalog';
 import type { DownloadRow } from '$lib/server/download';
 
 function viewerItemIds(passcodeId: string) {
@@ -79,7 +85,7 @@ export async function downloadRows(
 		);
 }
 
-type CatalogRow = Omit<CatalogItem, 'thumbnailInstanceId'> & {
+type CatalogRow = Omit<CatalogItem, 'thumbnail'> & {
 	projectId: string;
 	projectName: string;
 	studyInstanceUid: string | null;
@@ -93,7 +99,7 @@ type CatalogRow = Omit<CatalogItem, 'thumbnailInstanceId'> & {
  */
 export function groupCatalog(
 	rows: CatalogRow[],
-	thumbnails: Map<string, string> = new Map()
+	thumbnails: Map<string, ThumbnailRef> = new Map()
 ): CatalogProject[] {
 	const projects = new Map<string, CatalogProject>();
 	for (const row of rows) {
@@ -122,7 +128,7 @@ export function groupCatalog(
 			instanceCount: row.instanceCount,
 			volume: row.volume,
 			seriesNumber: row.seriesNumber,
-			thumbnailInstanceId: thumbnails.get(row.id) ?? null
+			thumbnail: thumbnails.get(row.id) ?? null
 		});
 	}
 
@@ -145,11 +151,11 @@ export function groupCatalog(
 }
 
 /** Middle instance (by slice order) of each item; STL items have a single instance. */
-async function middleInstances(itemIds: string[]): Promise<Map<string, string>> {
+async function middleInstances(itemIds: string[]): Promise<Map<string, ThumbnailRef>> {
 	if (itemIds.length === 0) return new Map();
-	const rows = await db.execute<{ item_id: string; id: string }>(sql`
-		select item_id, id from (
-			select ${instance.itemId} as item_id, ${instance.id} as id,
+	const rows = await db.execute<{ item_id: string; id: string; thumbnail: boolean }>(sql`
+		select item_id, id, thumbnail from (
+			select ${instance.itemId} as item_id, ${instance.id} as id, ${instance.thumbnail} as thumbnail,
 				row_number() over (partition by ${instance.itemId} order by ${instance.sortKey}) as position,
 				count(*) over (partition by ${instance.itemId}) as total
 			from ${instance}
@@ -157,7 +163,22 @@ async function middleInstances(itemIds: string[]): Promise<Map<string, string>> 
 		) ranked
 		where position = total / 2 + 1
 	`);
-	return new Map(rows.map((r) => [r.item_id, r.id]));
+	return new Map(rows.map((r) => [r.item_id, { instanceId: r.id, stored: r.thumbnail }]));
+}
+
+/** Thumbnails the project's image and STL items still need; the admin's browser renders them. */
+export async function missingThumbnails(projectId: string): Promise<MissingThumbnail[]> {
+	const items = await db
+		.select({ id: item.id, kind: item.kind })
+		.from(item)
+		.where(and(eq(item.projectId, projectId), ne(item.kind, 'sr')));
+	const middles = await middleInstances(items.map((i) => i.id));
+	return items.flatMap(({ id, kind }) => {
+		const middle = middles.get(id);
+		return middle && !middle.stored && kind !== 'sr'
+			? [{ instanceId: middle.instanceId, kind }]
+			: [];
+	});
 }
 
 /** All items visible to the current admin or viewer, grouped for display. */

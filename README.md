@@ -60,7 +60,8 @@ Prerequisites: Node.js 24, pnpm and Podman.
    Open <http://localhost:5173>. Database migrations run automatically when the server starts.
    If you use a different port, update `ORIGIN` and `BETTER_AUTH_URL` in `.env` to match.
 
-Uploaded files are stored under `DATA_DIR` (`./data` locally). The database only stores metadata.
+Uploaded files and their stored preview images are kept under `DATA_DIR` (`./data` locally). The
+database only stores metadata.
 
 ## Using the app
 

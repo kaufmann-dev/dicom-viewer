@@ -10,8 +10,13 @@ export type CatalogItem = {
 	volume: boolean;
 	seriesNumber: number | null;
 	/** Middle instance of an image series, or the model of an STL item, used for its thumbnail. */
-	thumbnailInstanceId: string | null;
+	thumbnail: ThumbnailRef | null;
 };
+
+/** The instance a thumbnail is rendered from, and whether the server already stores it. */
+export type ThumbnailRef = { instanceId: string; stored: boolean };
+
+export type MissingThumbnail = { instanceId: string; kind: 'image' | 'stl' };
 
 export type CatalogStudy = {
 	key: string;

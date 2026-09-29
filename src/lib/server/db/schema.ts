@@ -65,7 +65,9 @@ export const instance = pgTable(
 		size: integer('size').notNull(),
 		geometry: jsonb('geometry').$type<InstanceGeometry>(),
 		sortKey: doublePrecision('sort_key').notNull().default(0),
-		srContent: jsonb('sr_content').$type<SrDocument>()
+		srContent: jsonb('sr_content').$type<SrDocument>(),
+		/** Whether a rendered thumbnail is stored next to the file (see `thumbnailPath`). */
+		thumbnail: boolean('thumbnail').notNull().default(false)
 	},
 	(t) => [unique().on(t.projectId, t.sopInstanceUid), index().on(t.itemId)]
 );

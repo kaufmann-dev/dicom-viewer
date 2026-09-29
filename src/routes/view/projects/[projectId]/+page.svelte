@@ -224,7 +224,7 @@
 					{#if study.tiles.length}
 						<div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
 							{#each study.tiles as item (item.id)}
-								<ItemTile {item} />
+								<ItemTile {item} storeThumbnails={data.role === 'admin'} />
 							{/each}
 						</div>
 					{/if}

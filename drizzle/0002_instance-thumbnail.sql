@@ -1,0 +1,1 @@
+ALTER TABLE "instance" ADD COLUMN "thumbnail" boolean DEFAULT false NOT NULL;

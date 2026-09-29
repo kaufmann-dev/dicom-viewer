@@ -10,6 +10,8 @@ const CONCURRENCY = 4;
 /** Rendered thumbnails for this browser session, keyed by instance id. */
 const rendered = new Map<string, string>();
 const pending = new Map<string, Promise<string>>();
+/** Thumbnails this browser session already stored on the server. */
+const stored = new Set<string>();
 const queue: (() => void)[] = [];
 let active = 0;
 
@@ -86,6 +88,19 @@ export function loadThumbnail(instanceId: string, kind: ThumbnailKind): Promise<
 		pending.set(instanceId, promise);
 	}
 	return promise;
+}
+
+/** Stores a rendered thumbnail on the server, so later visitors load it instead of rendering. */
+export async function storeThumbnail(instanceId: string, dataUrl: string): Promise<void> {
+	if (stored.has(instanceId)) return;
+	const body = await (await fetch(dataUrl)).blob();
+	const response = await fetch(`/api/admin/thumbnails/${instanceId}`, {
+		method: 'PUT',
+		headers: { 'content-type': 'image/jpeg' },
+		body
+	});
+	if (!response.ok) throw new Error(`Storing the thumbnail failed: ${response.status}`);
+	stored.add(instanceId);
 }
 
 /** Frees decoded images and DICOM data once thumbnails are no longer displayed. */

@@ -8,25 +8,40 @@
 	import type { CatalogItem } from '$lib/catalog';
 	import { itemTypeText } from '$lib/item-kind';
 
-	let { item }: { item: CatalogItem } = $props();
+	let { item, storeThumbnails = false }: { item: CatalogItem; storeThumbnails?: boolean } =
+		$props();
 
-	let src: string | null = $state(null);
+	let rendered: string | null = $state(null);
+	let storedFailed = $state(false);
 	let failed = $state(false);
 
-	/** Loads the thumbnail once the tile scrolls into view. Cornerstone is browser-only. */
+	const stored = $derived(
+		item.thumbnail?.stored && !storedFailed
+			? `/api/files/${item.thumbnail.instanceId}/thumbnail`
+			: null
+	);
+	const src = $derived(stored ?? rendered);
+
+	/**
+	 * Renders a thumbnail the server does not store yet once the tile scrolls into view, and lets
+	 * admins store it for later visitors. Cornerstone is browser-only.
+	 */
 	const lazyThumbnail: Attachment<HTMLElement> = (element) => {
-		const instanceId = item.thumbnailInstanceId;
+		const thumbnail = item.thumbnail;
 		const kind = item.kind;
-		if (!instanceId || kind === 'sr') return;
+		if (!thumbnail || kind === 'sr' || (thumbnail.stored && !storedFailed)) return;
+		const store = storeThumbnails;
 		let cancelled = false;
 		const observer = new IntersectionObserver(
 			async (entries) => {
 				if (!entries.some((e) => e.isIntersecting)) return;
 				observer.disconnect();
 				try {
-					const { loadThumbnail } = await import('$lib/viewer/thumbnails');
-					const url = await loadThumbnail(instanceId, kind);
-					if (!cancelled) src = url;
+					const { loadThumbnail, storeThumbnail } = await import('$lib/viewer/thumbnails');
+					const url = await loadThumbnail(thumbnail.instanceId, kind);
+					if (!cancelled) rendered = url;
+					// Failures are harmless: the next admin visit tries again.
+					if (store) storeThumbnail(thumbnail.instanceId, url).catch(() => {});
 				} catch {
 					if (!cancelled) failed = true;
 				}
@@ -59,7 +74,14 @@
 		{@attach lazyThumbnail}
 	>
 		{#if src}
-			<img {src} alt="" class="h-full w-full object-contain" />
+			<img
+				{src}
+				alt=""
+				loading="lazy"
+				decoding="async"
+				class="h-full w-full object-contain"
+				onerror={() => (storedFailed = true)}
+			/>
 		{:else}
 			<Icon class="size-10" aria-hidden="true" />
 		{/if}

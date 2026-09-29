@@ -15,6 +15,13 @@
       "when": 1790537311937,
       "tag": "0001_passcode-allow-download",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790676268695,
+      "tag": "0002_instance-thumbnail",
+      "breakpoints": true
     }
   ]
 }

@@ -4,6 +4,7 @@
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 	import { Button } from '$lib/components/ui/button';
 	import { Progress } from '$lib/components/ui/progress';
+	import type { MissingThumbnail } from '$lib/catalog';
 
 	let { projectId }: { projectId: string } = $props();
 
@@ -21,6 +22,7 @@
 	let tally: Tally = $state({ added: 0, duplicate: 0, skipped: 0, failed: 0 });
 	let finished = $state(false);
 	let failure = $state('');
+	let previews: { done: number; total: number; failed: number } | null = $state(null);
 
 	async function readEntry(entry: FileSystemEntry, out: Upload[]): Promise<void> {
 		if (entry.isFile) {
@@ -50,6 +52,7 @@
 		total = queue.length;
 		done = 0;
 		tally = { added: 0, duplicate: 0, skipped: 0, failed: 0 };
+		previews = null;
 
 		let next = 0;
 		async function worker() {
@@ -78,13 +81,41 @@
 		try {
 			await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 			const response = await fetch(`/api/admin/projects/${projectId}/finalize`, { method: 'POST' });
-			if (!response.ok) failure = 'The upload finished, but the project could not be updated.';
+			if (response.ok) {
+				const { missingThumbnails }: { missingThumbnails: MissingThumbnail[] } =
+					await response.json();
+				await createPreviews(missingThumbnails);
+			} else {
+				failure = 'The upload finished, but the project could not be updated.';
+			}
 		} catch {
 			failure = 'The connection was lost during the upload.';
 		}
 		await invalidateAll();
 		running = false;
 		finished = true;
+	}
+
+	/** Renders thumbnails here once and stores them, so viewers load them instead of rendering. */
+	async function createPreviews(missing: MissingThumbnail[]) {
+		if (missing.length === 0) return;
+		previews = { done: 0, total: missing.length, failed: 0 };
+		// The reactive proxy, so that progress updates render.
+		const current = previews;
+		const { loadThumbnail, releaseThumbnailData, storeThumbnail } =
+			await import('$lib/viewer/thumbnails');
+		// loadThumbnail renders a few at a time.
+		await Promise.all(
+			missing.map(async ({ instanceId, kind }) => {
+				try {
+					await storeThumbnail(instanceId, await loadThumbnail(instanceId, kind));
+				} catch {
+					current.failed++;
+				}
+				current.done++;
+			})
+		);
+		releaseThumbnailData();
 	}
 
 	function fromInput(input: HTMLInputElement) {
@@ -155,14 +186,29 @@
 	{#if running || finished}
 		<div class="mt-6" role="status">
 			<div class="flex justify-between text-sm">
-				<span>{running ? 'Uploading…' : 'Upload finished'}</span>
-				<span class="tabular-nums">{done} / {total}</span>
+				<span>
+					{#if !running}Upload finished{:else if previews}Creating previews…{:else}Uploading…{/if}
+				</span>
+				<span class="tabular-nums">
+					{#if running && previews}{previews.done} / {previews.total}{:else}{done} / {total}{/if}
+				</span>
 			</div>
-			<Progress class="mt-2" value={done} max={total} />
+			{#if running && previews}
+				<Progress class="mt-2" value={previews.done} max={previews.total} />
+			{:else}
+				<Progress class="mt-2" value={done} max={total} />
+			{/if}
 			<p class="mt-2 text-xs text-muted-foreground">
 				{tally.added} added · {tally.duplicate} already present · {tally.skipped} not DICOM or STL{#if tally.failed}
 					· <span class="text-destructive">{tally.failed} failed</span>{/if}
 			</p>
+			{#if !running && previews?.failed}
+				<p class="mt-2 text-xs text-muted-foreground">
+					{previews.failed}
+					{previews.failed === 1 ? 'preview' : 'previews'} could not be created. They are created when
+					an admin opens the project.
+				</p>
+			{/if}
 			{#if failure}<p class="mt-2 text-sm text-destructive" role="alert">{failure}</p>{/if}
 		</div>
 	{/if}
