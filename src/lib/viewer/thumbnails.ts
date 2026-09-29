@@ -49,6 +49,8 @@ function drawOverlays(canvas: HTMLCanvasElement, imageId: string) {
 	const left = (canvas.width - image.columns * scale) / 2;
 	const top = (canvas.height - image.rows * scale) / 2;
 	const context = canvas.getContext('2d')!;
+	// The CPU renderer leaves the context in image pixel coordinates; draw in canvas coordinates.
+	context.setTransform(1, 0, 0, 1, 0, 0);
 	for (const plane of planes) {
 		context.drawImage(
 			overlayBitmap(plane),

@@ -22,6 +22,13 @@
       "when": 1790676268695,
       "tag": "0002_instance-thumbnail",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790678227358,
+      "tag": "0003_rerender-thumbnails",
+      "breakpoints": true
     }
   ]
 }
