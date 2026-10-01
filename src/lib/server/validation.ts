@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { normalizeCode } from '$lib/server/passcode';
+import { normalizeCode } from '#lib/server/passcode.js';
 
 export const idSchema = z.uuid();
 

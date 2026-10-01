@@ -3,13 +3,13 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { genericOAuth } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { getRequestEvent } from '$app/server';
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
-import * as schema from '$lib/server/db/schema';
+import * as env from '$app/env/private';
+import { db } from '#lib/server/db/index.js';
+import * as schema from '#lib/server/db/schema.js';
 
 export const OIDC_PROVIDER_ID = 'oidc';
 
-function required(name: string): string {
+function required(name: keyof typeof env): string {
 	const value = env[name];
 	if (!value) throw new Error(`${name} is not set`);
 	return value;

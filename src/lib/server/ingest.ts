@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { and, eq, sql } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { instance, item } from '$lib/server/db/schema';
-import { layoutSeries } from '$lib/server/dicom/geometry';
-import { parseDicom } from '$lib/server/dicom/parse';
-import { isStl, stlLabel } from '$lib/server/stl';
-import { itemDir, removeStored, writeStoredFile } from '$lib/server/storage';
+import { db } from '#lib/server/db/index.js';
+import { instance, item } from '#lib/server/db/schema.js';
+import { layoutSeries } from '#lib/server/dicom/geometry.js';
+import { parseDicom } from '#lib/server/dicom/parse.js';
+import { isStl, stlLabel } from '#lib/server/stl.js';
+import { itemDir, removeStored, writeStoredFile } from '#lib/server/storage.js';
 
 export type IngestResult =
 	| { status: 'added' | 'duplicate'; kind: 'image' | 'sr' | 'stl' }

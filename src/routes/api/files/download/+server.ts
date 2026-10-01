@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
 import { downloadZip, predictLength } from 'client-zip';
-import { downloadRows, type DownloadFilter } from '$lib/server/access';
+import { downloadRows, type DownloadFilter } from '#lib/server/access.js';
 import {
 	archiveEntries,
 	contentDisposition,
@@ -10,9 +10,9 @@ import {
 	isoDate,
 	type ArchiveEntry,
 	type DownloadRow
-} from '$lib/server/download';
-import { resolveStoredPath } from '$lib/server/storage';
-import { idSchema } from '$lib/server/validation';
+} from '#lib/server/download.js';
+import { resolveStoredPath } from '#lib/server/storage.js';
+import { idSchema } from '#lib/server/validation.js';
 import type { RequestHandler } from './$types';
 
 /** `?item=<id>`, `?project=<id>` or `?project=<id>&study=<StudyInstanceUID | stl>`. */

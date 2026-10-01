@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { SvelteSet } from 'svelte/reactivity';
-	import type { CatalogProject } from '$lib/catalog';
-	import { Button } from '$lib/components/ui/button';
-	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { itemKindLabel } from '$lib/item-kind';
-	import { formatDicomDate } from '$lib/sr';
+	import type { CatalogProject } from '#lib/catalog.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { itemKindLabel } from '#lib/item-kind.js';
+	import { formatDicomDate } from '#lib/sr.js';
 
 	let {
 		catalog,

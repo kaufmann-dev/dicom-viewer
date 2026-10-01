@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
+	import * as ToggleGroup from '#lib/components/ui/toggle-group/index.js';
 
 	let {
 		value,

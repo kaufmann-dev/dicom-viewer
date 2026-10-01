@@ -1,9 +1,9 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { project } from '$lib/server/db/schema';
-import { ingestFile } from '$lib/server/ingest';
-import { idSchema } from '$lib/server/validation';
+import { db } from '#lib/server/db/index.js';
+import { project } from '#lib/server/db/schema.js';
+import { ingestFile } from '#lib/server/ingest.js';
+import { idSchema } from '#lib/server/validation.js';
 import type { RequestHandler } from './$types';
 
 /** Receives one file per request as the raw body; `name` is its path relative to the upload. */
@@ -18,5 +18,5 @@ export const PUT: RequestHandler = async ({ params, request, url }) => {
 	}
 	const name = url.searchParams.get('name') ?? '';
 	const bytes = new Uint8Array(await request.arrayBuffer());
-	return json(await ingestFile(row.id, name, bytes));
+	return Response.json(await ingestFile(row.id, name, bytes));
 };

@@ -1,4 +1,4 @@
-import { canDownload } from '$lib/server/access';
+import { canDownload } from '#lib/server/access.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = ({ locals }) => ({

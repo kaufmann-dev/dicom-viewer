@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ToggleGroup as ToggleGroupPrimitive } from 'bits-ui';
-	import { FIELD_SURFACE } from '$lib/components/field-surface';
-	import * as ToggleGroup from '$lib/components/ui/toggle-group';
-	import { cn } from '$lib/utils';
+	import { FIELD_SURFACE } from '#lib/components/field-surface.js';
+	import * as ToggleGroup from '#lib/components/ui/toggle-group/index.js';
+	import { cn } from '#lib/utils.js';
 
 	let { class: className, ...restProps }: ToggleGroupPrimitive.ItemProps = $props();
 </script>

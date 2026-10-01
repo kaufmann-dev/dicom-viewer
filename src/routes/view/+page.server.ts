@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { listCatalog } from '$lib/server/access';
+import { listCatalog } from '#lib/server/access.js';
 import type { PageServerLoad } from './$types';
 
 /** Opens the project with the newest study, or shows the empty state. */

@@ -11,17 +11,17 @@
 		type Types
 	} from '@cornerstonejs/core';
 	import { CrosshairsTool, ToolGroupManager, type Types as ToolTypes } from '@cornerstonejs/tools';
-	import { Progress } from '$lib/components/ui/progress';
-	import * as Segmented from '$lib/components/segmented';
+	import { Progress } from '#lib/components/ui/progress/index.js';
+	import * as Segmented from '#lib/components/segmented/index.js';
 	import BoxIcon from '@lucide/svelte/icons/box';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
-	import { FIELD_SURFACE } from '$lib/components/field-surface';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
-	import { buttonVariants } from '$lib/components/ui/button';
-	import { cn } from '$lib/utils';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Slider } from '$lib/components/ui/slider';
+	import { FIELD_SURFACE } from '#lib/components/field-surface.js';
+	import { IsMobile } from '#lib/hooks/is-mobile.svelte.js';
+	import { buttonVariants } from '#lib/components/ui/button/index.js';
+	import { cn } from '#lib/utils.js';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
+	import { Slider } from '#lib/components/ui/slider/index.js';
 	import {
 		add3dTools,
 		addViewingTools,

@@ -2,14 +2,14 @@
 	import { resolve } from '$app/paths';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import DownloadIcon from '@lucide/svelte/icons/download';
-	import { Button } from '$lib/components/ui/button';
-	import { downloadHref } from '$lib/download';
-	import { itemTypeText } from '$lib/item-kind';
-	import { formatDicomDate } from '$lib/sr';
-	import DicomStackViewer from '$lib/viewer/dicom-stack-viewer.svelte';
-	import DicomVolumeViewer from '$lib/viewer/dicom-volume-viewer.svelte';
-	import SrReport from '$lib/viewer/sr-report.svelte';
-	import StlViewer from '$lib/viewer/stl-viewer.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { downloadHref } from '#lib/download.js';
+	import { itemTypeText } from '#lib/item-kind.js';
+	import { formatDicomDate } from '#lib/sr.js';
+	import DicomStackViewer from '#lib/viewer/dicom-stack-viewer.svelte';
+	import DicomVolumeViewer from '#lib/viewer/dicom-volume-viewer.svelte';
+	import SrReport from '#lib/viewer/sr-report.svelte';
+	import StlViewer from '#lib/viewer/stl-viewer.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

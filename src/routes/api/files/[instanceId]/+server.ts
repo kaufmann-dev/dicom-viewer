@@ -3,10 +3,10 @@ import { stat } from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { canAccessItem } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { instance } from '$lib/server/db/schema';
-import { resolveStoredPath } from '$lib/server/storage';
+import { canAccessItem } from '#lib/server/access.js';
+import { db } from '#lib/server/db/index.js';
+import { instance } from '#lib/server/db/schema.js';
+import { resolveStoredPath } from '#lib/server/storage.js';
 import type { RequestHandler } from './$types';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

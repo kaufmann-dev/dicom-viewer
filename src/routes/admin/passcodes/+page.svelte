@@ -3,11 +3,11 @@
 	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import { toast } from 'svelte-sonner';
-	import ConfirmDelete from '$lib/components/admin/confirm-delete.svelte';
-	import PasscodeForm from '$lib/components/admin/passcode-form.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import * as Sheet from '$lib/components/ui/sheet';
-	import * as Table from '$lib/components/ui/table';
+	import ConfirmDelete from '#lib/components/admin/confirm-delete.svelte';
+	import PasscodeForm from '#lib/components/admin/passcode-form.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Sheet from '#lib/components/ui/sheet/index.js';
+	import * as Table from '#lib/components/ui/table/index.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

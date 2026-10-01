@@ -1,10 +1,10 @@
 import { fail } from '@sveltejs/kit';
 import { and, desc, eq, inArray, ne } from 'drizzle-orm';
 import { z } from 'zod';
-import { listCatalog } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { item, passcode, passcodeItem } from '$lib/server/db/schema';
-import { codeSchema, idSchema, nameSchema } from '$lib/server/validation';
+import { listCatalog } from '#lib/server/access.js';
+import { db } from '#lib/server/db/index.js';
+import { item, passcode, passcodeItem } from '#lib/server/db/schema.js';
+import { codeSchema, idSchema, nameSchema } from '#lib/server/validation.js';
 import type { Actions, PageServerLoad } from './$types';
 
 const saveSchema = z.object({

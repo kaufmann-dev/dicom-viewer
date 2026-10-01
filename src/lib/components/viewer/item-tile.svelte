@@ -5,8 +5,8 @@
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import ImageOffIcon from '@lucide/svelte/icons/image-off';
 	import LayersIcon from '@lucide/svelte/icons/layers';
-	import type { CatalogItem } from '$lib/catalog';
-	import { itemTypeText } from '$lib/item-kind';
+	import type { CatalogItem } from '#lib/catalog.js';
+	import { itemTypeText } from '#lib/item-kind.js';
 
 	let { item, storeThumbnails = false }: { item: CatalogItem; storeThumbnails?: boolean } =
 		$props();
@@ -37,7 +37,7 @@
 				if (!entries.some((e) => e.isIntersecting)) return;
 				observer.disconnect();
 				try {
-					const { loadThumbnail, storeThumbnail } = await import('$lib/viewer/thumbnails');
+					const { loadThumbnail, storeThumbnail } = await import('#lib/viewer/thumbnails.js');
 					const url = await loadThumbnail(thumbnail.instanceId, kind);
 					if (!cancelled) rendered = url;
 					// Failures are harmless: the next admin visit tries again.

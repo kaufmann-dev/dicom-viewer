@@ -5,6 +5,11 @@ allowBuilds:
   core-js-pure: false
   esbuild: true
 
+minimumReleaseAgeExclude:
+  - '@sveltejs/adapter-node@6.0.0'
+  - '@sveltejs/kit@3.0.0'
+  - '@better-auth/drizzle-adapter@1.7.7'
+
 # vtk.js (used by Cornerstone3D) bundles xmlbuilder2, which imports Node's `events` module.
 packageExtensions:
   xmlbuilder2:
@@ -14,3 +19,10 @@ packageExtensions:
 patchedDependencies:
   '@cornerstonejs/core@5.11.0': patches/@cornerstonejs__core@5.11.0.patch
   '@kitware/vtk.js@36.4.1': patches/@kitware__vtk.js@36.4.1.patch
+
+# Patched releases of helper packages that upstream pins to vulnerable versions.
+overrides:
+  '@cornerstonejs/dicom-image-loader>uuid': ^11.1.1
+  '@esbuild-kit/core-utils>esbuild': ^0.28.1
+  '@kitware/vtk.js>fflate': ^0.7.5
+  dcmjs>adm-zip: ^0.6.1

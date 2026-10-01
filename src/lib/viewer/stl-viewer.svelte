@@ -4,11 +4,11 @@
 	import { Mesh, MOUSE, Sphere, Vector3, WebGLRenderer } from 'three';
 	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 	import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-	import { Button } from '$lib/components/ui/button';
-	import { Progress } from '$lib/components/ui/progress';
-	import { FIELD_SURFACE } from '$lib/components/field-surface';
-	import { Toggle } from '$lib/components/ui/toggle';
-	import { cn } from '$lib/utils';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Progress } from '#lib/components/ui/progress/index.js';
+	import { FIELD_SURFACE } from '#lib/components/field-surface.js';
+	import { Toggle } from '#lib/components/ui/toggle/index.js';
+	import { cn } from '#lib/utils.js';
 	import MouseHint from './mouse-hint.svelte';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
 	import { addModel, createStlScene, frameModel } from './stl-scene';

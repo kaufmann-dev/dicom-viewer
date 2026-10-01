@@ -9,12 +9,12 @@
 	import RulerIcon from '@lucide/svelte/icons/ruler';
 	import SunMediumIcon from '@lucide/svelte/icons/sun-medium';
 	import ZoomInIcon from '@lucide/svelte/icons/zoom-in';
-	import { FIELD_SURFACE } from '$lib/components/field-surface';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import { cn } from '$lib/utils';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import * as Segmented from '$lib/components/segmented';
-	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { FIELD_SURFACE } from '#lib/components/field-surface.js';
+	import { Button, buttonVariants } from '#lib/components/ui/button/index.js';
+	import { cn } from '#lib/utils.js';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
+	import * as Segmented from '#lib/components/segmented/index.js';
+	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
 	import { PRIMARY_TOOL_LABELS, type PrimaryTool, type WindowPreset } from './cornerstone';
 	import MouseHint from './mouse-hint.svelte';
 	import { MOUSE_HINTS_2D, PRIMARY_TOOL_HINTS } from './mouse-hints';

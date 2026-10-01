@@ -1,14 +1,14 @@
 import { and, asc, eq, inArray, ne, sql, type SQL } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { instance, item, passcodeItem, project } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { instance, item, passcodeItem, project } from '#lib/server/db/schema.js';
 import {
 	itemOrder,
 	type CatalogItem,
 	type CatalogProject,
 	type MissingThumbnail,
 	type ThumbnailRef
-} from '$lib/catalog';
-import type { DownloadRow } from '$lib/server/download';
+} from '#lib/catalog.js';
+import type { DownloadRow } from '#lib/server/download.js';
 
 function viewerItemIds(passcodeId: string) {
 	return db

@@ -1,10 +1,10 @@
 import { createHash, randomBytes } from 'node:crypto';
 import type { Cookies } from '@sveltejs/kit';
 import { and, eq, gt, lte } from 'drizzle-orm';
-import { dev } from '$app/environment';
-import { db } from '$lib/server/db';
-import { passcode, viewerSession } from '$lib/server/db/schema';
-import { FailureLimiter, normalizeCode, viewerSessionExpiry } from '$lib/server/passcode';
+import { dev } from '$app/env';
+import { db } from '#lib/server/db/index.js';
+import { passcode, viewerSession } from '#lib/server/db/schema.js';
+import { FailureLimiter, normalizeCode, viewerSessionExpiry } from '#lib/server/passcode.js';
 
 export const VIEWER_COOKIE = 'viewer_session';
 

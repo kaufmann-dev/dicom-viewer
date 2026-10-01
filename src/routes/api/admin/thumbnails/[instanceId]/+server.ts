@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { instance, item } from '$lib/server/db/schema';
-import { writeStoredFile } from '$lib/server/storage';
-import { isJpeg, thumbnailPath } from '$lib/server/thumbnails';
-import { idSchema } from '$lib/server/validation';
+import { db } from '#lib/server/db/index.js';
+import { instance, item } from '#lib/server/db/schema.js';
+import { writeStoredFile } from '#lib/server/storage.js';
+import { isJpeg, thumbnailPath } from '#lib/server/thumbnails.js';
+import { idSchema } from '#lib/server/validation.js';
 import type { RequestHandler } from './$types';
 
 const MAX_BYTES = 1024 * 1024;

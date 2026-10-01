@@ -1,5 +1,5 @@
 import dcmjs from 'dcmjs';
-import type { SrDocument } from '$lib/sr';
+import type { SrDocument } from '#lib/sr.js';
 import type { InstanceGeometry } from './geometry';
 import { asString, extractSrDocument } from './sr';
 

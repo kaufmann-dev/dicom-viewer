@@ -1,10 +1,11 @@
-import { json, redirect, type Handle, type ServerInit } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
+import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { building } from '$app/environment';
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { readViewerSession } from '$lib/server/viewer-auth';
+import { building } from '$app/env';
+import { auth } from '#lib/server/auth.js';
+import { db } from '#lib/server/db/index.js';
+import { readViewerSession } from '#lib/server/viewer-auth.js';
 
 export const init: ServerInit = async () => {
 	await migrate(db, { migrationsFolder: 'drizzle' });
@@ -25,13 +26,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { admin, viewer } = event.locals;
 
 	if (under(pathname, '/api/admin') && !admin) {
-		return json({ message: 'Admin sign-in required' }, { status: 401 });
+		return Response.json({ message: 'Admin sign-in required' }, { status: 401 });
 	}
 	if (under(pathname, '/admin') && !admin) {
 		redirect(303, `/?returnTo=${encodeURIComponent(pathname + search)}`);
 	}
 	if (under(pathname, '/api/files') && !admin && !viewer) {
-		return json({ message: 'Sign-in required' }, { status: 401 });
+		return Response.json({ message: 'Sign-in required' }, { status: 401 });
 	}
 	if (under(pathname, '/view') && !admin && !viewer) {
 		redirect(303, '/');

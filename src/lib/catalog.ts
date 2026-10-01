@@ -1,4 +1,4 @@
-import { DOSE_SR_SOP_CLASS } from '$lib/sr';
+import { DOSE_SR_SOP_CLASS } from '#lib/sr.js';
 
 export type CatalogItem = {
 	id: string;

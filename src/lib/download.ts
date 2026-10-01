@@ -4,5 +4,5 @@ import { resolve } from '$app/paths';
 export function downloadHref(
 	query: { item: string } | { project: string; study?: string }
 ): string {
-	return `${resolve('/api/files/download')}?${new URLSearchParams(query)}`;
+	return `${resolve('api/files/download')}?${new URLSearchParams(query)}`;
 }

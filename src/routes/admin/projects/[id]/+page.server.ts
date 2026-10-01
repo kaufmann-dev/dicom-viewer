@@ -1,9 +1,9 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, asc, eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { item, project } from '$lib/server/db/schema';
-import { itemDir, projectDir, removeStored } from '$lib/server/storage';
-import { idSchema, nameSchema } from '$lib/server/validation';
+import { db } from '#lib/server/db/index.js';
+import { item, project } from '#lib/server/db/schema.js';
+import { itemDir, projectDir, removeStored } from '#lib/server/storage.js';
+import { idSchema, nameSchema } from '#lib/server/validation.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {

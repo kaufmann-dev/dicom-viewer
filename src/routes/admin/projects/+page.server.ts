@@ -1,8 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { count, desc, sum } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { instance, item, project } from '$lib/server/db/schema';
-import { nameSchema } from '$lib/server/validation';
+import { db } from '#lib/server/db/index.js';
+import { instance, item, project } from '#lib/server/db/schema.js';
+import { nameSchema } from '#lib/server/validation.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {

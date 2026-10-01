@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { env } from '$env/dynamic/private';
+import { DATA_DIR } from '$app/env/private';
 
 function dataDir(): string {
-	if (!env.DATA_DIR) throw new Error('DATA_DIR is not set');
-	return path.resolve(env.DATA_DIR);
+	if (!DATA_DIR) throw new Error('DATA_DIR is not set');
+	return path.resolve(DATA_DIR);
 }
 
 /** Resolves a stored relative path, refusing anything outside DATA_DIR. */

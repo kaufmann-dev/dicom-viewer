@@ -2,9 +2,9 @@
 	import { invalidateAll } from '$app/navigation';
 	import FilesIcon from '@lucide/svelte/icons/files';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
-	import { Button } from '$lib/components/ui/button';
-	import { Progress } from '$lib/components/ui/progress';
-	import type { MissingThumbnail } from '$lib/catalog';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Progress } from '#lib/components/ui/progress/index.js';
+	import type { MissingThumbnail } from '#lib/catalog.js';
 
 	let { projectId }: { projectId: string } = $props();
 
@@ -103,7 +103,7 @@
 		// The reactive proxy, so that progress updates render.
 		const current = previews;
 		const { loadThumbnail, releaseThumbnailData, storeThumbnail } =
-			await import('$lib/viewer/thumbnails');
+			await import('#lib/viewer/thumbnails.js');
 		// loadThumbnail renders a few at a time.
 		await Promise.all(
 			missing.map(async ({ instanceId, kind }) => {

@@ -84,17 +84,17 @@ After five wrong passcodes, an IP address is blocked for 15 minutes.
 
 ## Configuration
 
-| Variable             | Required | Description                                                        |
-| -------------------- | -------- | ------------------------------------------------------------------ |
-| `DATABASE_URL`       | Yes      | PostgreSQL connection string                                       |
-| `DATA_DIR`           | Yes      | Directory for uploaded DICOM and STL files; must be persistent     |
-| `ORIGIN`             | Yes      | Public origin of the app, e.g. `https://scans.kaufmann.dev`        |
-| `BETTER_AUTH_URL`    | Yes      | Same value as `ORIGIN`                                             |
-| `BETTER_AUTH_SECRET` | Yes      | At least 32 random characters                                      |
-| `OIDC_DISCOVERY_URL` | Yes      | The provider's `/.well-known/openid-configuration` URL             |
-| `OIDC_CLIENT_ID`     | Yes      | OIDC client ID                                                     |
-| `OIDC_CLIENT_SECRET` | Yes      | OIDC client secret                                                 |
-| `BODY_SIZE_LIMIT`    | Yes      | Maximum request body size; must exceed the largest file, e.g. `1G` |
+| Variable             | Required | Description                                                                                                       |
+| -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`       | Yes      | PostgreSQL connection string                                                                                      |
+| `DATA_DIR`           | Yes      | Directory for uploaded DICOM and STL files; must be persistent                                                    |
+| `ORIGIN`             | Yes      | Public origin of the app, e.g. `https://scans.kaufmann.dev`; also needed at build time (SvelteKit `paths.origin`) |
+| `BETTER_AUTH_URL`    | Yes      | Same value as `ORIGIN`                                                                                            |
+| `BETTER_AUTH_SECRET` | Yes      | At least 32 random characters                                                                                     |
+| `OIDC_DISCOVERY_URL` | Yes      | The provider's `/.well-known/openid-configuration` URL                                                            |
+| `OIDC_CLIENT_ID`     | Yes      | OIDC client ID                                                                                                    |
+| `OIDC_CLIENT_SECRET` | Yes      | OIDC client secret                                                                                                |
+| `BODY_SIZE_LIMIT`    | Yes      | Maximum request body size; must exceed the largest file, e.g. `1G`                                                |
 
 `BODY_SIZE_LIMIT` is read by the production server (`node build`). Without it, adapter-node
 rejects bodies over 512 KB, which blocks most uploads.

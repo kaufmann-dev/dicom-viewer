@@ -12,8 +12,8 @@ import {
 	unique,
 	uuid
 } from 'drizzle-orm/pg-core';
-import type { InstanceGeometry } from '$lib/server/dicom/geometry';
-import type { SrDocument } from '$lib/sr';
+import type { InstanceGeometry } from '#lib/server/dicom/geometry.js';
+import type { SrDocument } from '#lib/sr.js';
 
 export * from './auth.schema';
 

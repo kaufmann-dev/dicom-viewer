@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { asc, eq } from 'drizzle-orm';
-import { canAccessItem } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { instance, item } from '$lib/server/db/schema';
+import { canAccessItem } from '#lib/server/access.js';
+import { db } from '#lib/server/db/index.js';
+import { instance, item } from '#lib/server/db/schema.js';
 import type { PageServerLoad } from './$types';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

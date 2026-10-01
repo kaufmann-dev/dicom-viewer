@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { safeReturnTo } from '$lib/server/passcode';
-import { passcodeLimiter, signInWithPasscode } from '$lib/server/viewer-auth';
+import { safeReturnTo } from '#lib/server/passcode.js';
+import { passcodeLimiter, signInWithPasscode } from '#lib/server/viewer-auth.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = ({ locals, url }) => {

@@ -6,14 +6,14 @@
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import PencilIcon from '@lucide/svelte/icons/pencil';
 	import XIcon from '@lucide/svelte/icons/x';
-	import ConfirmDelete from '$lib/components/admin/confirm-delete.svelte';
-	import UploadPanel from '$lib/components/admin/upload-panel.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { downloadHref } from '$lib/download';
-	import * as Table from '$lib/components/ui/table';
-	import { itemTypeText } from '$lib/item-kind';
-	import { formatDicomDate } from '$lib/sr';
+	import ConfirmDelete from '#lib/components/admin/confirm-delete.svelte';
+	import UploadPanel from '#lib/components/admin/upload-panel.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { downloadHref } from '#lib/download.js';
+	import * as Table from '#lib/components/ui/table/index.js';
+	import { itemTypeText } from '#lib/item-kind.js';
+	import { formatDicomDate } from '#lib/sr.js';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -24,9 +24,9 @@
 
 <svelte:head><title>{data.project.name} · Scans</title></svelte:head>
 
-<Button variant="ghost" size="sm" href={resolve('/admin/projects')} class="-ml-2">
-	<ArrowLeftIcon />Projects
-</Button>
+<Button variant="ghost" size="sm" href={resolve('admin/projects')} class="-ml-2"
+	><ArrowLeftIcon />Projects</Button
+>
 
 <div class="mt-4 flex items-center gap-2">
 	{#if renamingProject}
@@ -46,10 +46,8 @@
 				variant="ghost"
 				size="icon"
 				aria-label="Cancel renaming"
-				onclick={() => (renamingProject = false)}
+				onclick={() => (renamingProject = false)}><XIcon /></Button
 			>
-				<XIcon />
-			</Button>
 		</form>
 	{:else}
 		<h1 class="min-w-0 truncate text-2xl font-semibold tracking-tight">{data.project.name}</h1>
@@ -57,10 +55,9 @@
 			variant="ghost"
 			size="icon-sm"
 			aria-label="Rename project"
-			onclick={() => (renamingProject = true)}
+			onclick={() => (renamingProject = true)}><PencilIcon /></Button
 		>
-			<PencilIcon />
-		</Button>
+
 		<span class="flex-1"></span>
 		{#if data.items.length}
 			<Button variant="outline" href={downloadHref({ project: data.project.id })} download>
@@ -121,10 +118,8 @@
 									variant="ghost"
 									size="icon"
 									aria-label="Cancel renaming"
-									onclick={() => (editingItem = null)}
+									onclick={() => (editingItem = null)}><XIcon /></Button
 								>
-									<XIcon />
-								</Button>
 							</form>
 						{:else}
 							<a
@@ -144,10 +139,9 @@
 								variant="ghost"
 								size="icon-sm"
 								aria-label="Rename {item.label}"
-								onclick={() => (editingItem = item.id)}
+								onclick={() => (editingItem = item.id)}><PencilIcon /></Button
 							>
-								<PencilIcon />
-							</Button>
+
 							<ConfirmDelete
 								action="?/deleteItem"
 								id={item.id}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SrNode } from '$lib/sr';
+	import type { SrNode } from '#lib/sr.js';
 	import SrField from './sr-field.svelte';
 	import SrNodeView from './sr-node.svelte';
 

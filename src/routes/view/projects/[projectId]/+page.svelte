@@ -6,13 +6,13 @@
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import SearchIcon from '@lucide/svelte/icons/search';
-	import LegalLinks from '$lib/components/legal-links.svelte';
-	import ItemTile from '$lib/components/viewer/item-tile.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { downloadHref } from '$lib/download';
-	import { Input } from '$lib/components/ui/input';
-	import { NativeSelect, NativeSelectOption } from '$lib/components/ui/native-select';
-	import * as Segmented from '$lib/components/segmented';
+	import LegalLinks from '#lib/components/legal-links.svelte';
+	import ItemTile from '#lib/components/viewer/item-tile.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { downloadHref } from '#lib/download.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { NativeSelect, NativeSelectOption } from '#lib/components/ui/native-select/index.js';
+	import * as Segmented from '#lib/components/segmented/index.js';
 	import {
 		formatStudyDate,
 		isDoseReport,
@@ -20,7 +20,7 @@
 		type CatalogItem,
 		type CatalogProject,
 		type ItemFilter
-	} from '$lib/catalog';
+	} from '#lib/catalog.js';
 	import type { PageProps, Snapshot } from './$types';
 
 	let { data }: PageProps = $props();
@@ -38,7 +38,7 @@
 
 	onDestroy(() => {
 		if (typeof window !== 'undefined') {
-			void import('$lib/viewer/thumbnails').then((m) => m.releaseThumbnailData());
+			void import('#lib/viewer/thumbnails.js').then((m) => m.releaseThumbnailData());
 		}
 	});
 
@@ -134,7 +134,7 @@
 						value={project.id}
 						onchange={(e) =>
 							goto(resolve('/view/projects/[projectId]', { projectId: e.currentTarget.value }), {
-								keepFocus: true
+								reset: false
 							})}
 					>
 						{#each data.catalog as p (p.id)}

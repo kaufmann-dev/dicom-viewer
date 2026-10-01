@@ -1,5 +1,5 @@
-import type { SrDocument, SrNode } from '$lib/sr';
-import { formatDicomDate, formatDicomDateTime, formatDicomTime } from '$lib/sr';
+import type { SrDocument, SrNode } from '#lib/sr.js';
+import { formatDicomDate, formatDicomDateTime, formatDicomTime } from '#lib/sr.js';
 
 type Dataset = Record<string, unknown>;
 

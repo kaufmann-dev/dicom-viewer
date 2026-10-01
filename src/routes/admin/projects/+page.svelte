@@ -2,10 +2,10 @@
 	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import * as Table from '$lib/components/ui/table';
-	import { formatBytes } from '$lib/format';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import * as Table from '#lib/components/ui/table/index.js';
+	import { formatBytes } from '#lib/format.js';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();

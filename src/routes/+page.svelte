@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { authClient, OIDC_PROVIDER_ID } from '$lib/auth-client';
-	import LegalLinks from '$lib/components/legal-links.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Spinner } from '$lib/components/ui/spinner';
+	import { authClient, OIDC_PROVIDER_ID } from '#lib/auth-client.js';
+	import LegalLinks from '#lib/components/legal-links.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
+	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
