@@ -2,14 +2,19 @@ import { createHash, randomUUID } from 'node:crypto';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.js';
 import { instance, item } from '#lib/server/db/schema.js';
+import type { ItemKind } from '#lib/catalog.js';
 import { layoutSeries } from '#lib/server/dicom/geometry.js';
-import { parseDicom } from '#lib/server/dicom/parse.js';
-import { isStl, stlLabel } from '#lib/server/stl.js';
+import { isDicomPart10, parseDicom } from '#lib/server/dicom/parse.js';
+import { detectPlainFile, fileLabel, pdfPath } from '#lib/server/file-types.js';
+import { isStl } from '#lib/server/stl.js';
 import { itemDir, removeStored, writeStoredFile } from '#lib/server/storage.js';
 
 export type IngestResult =
-	| { status: 'added' | 'duplicate'; kind: 'image' | 'sr' | 'stl' }
-	| { status: 'skipped'; reason: string };
+	{ status: 'added' | 'duplicate'; kind: ItemKind } | { status: 'skipped'; reason: string };
+
+type PlainKind = 'stl' | 'photo' | 'pdf';
+
+const PLAIN_LABELS: Record<PlainKind, string> = { stl: 'Model', photo: 'Photo', pdf: 'Document' };
 
 async function instanceExists(projectId: string, sopInstanceUid: string): Promise<boolean> {
 	const [row] = await db
@@ -20,11 +25,15 @@ async function instanceExists(projectId: string, sopInstanceUid: string): Promis
 	return Boolean(row);
 }
 
-/** Stores the file and its instance row; returns false when another upload already stored it. */
+/**
+ * Stores the file and its instance row; returns false when another upload already stored it. An
+ * extracted `pdf` is stored next to the file (see `pdfPath`).
+ */
 async function storeInstance(
 	values: Omit<typeof instance.$inferInsert, 'id' | 'path' | 'size'>,
 	extension: string,
-	bytes: Uint8Array
+	bytes: Uint8Array,
+	pdf: Uint8Array | null = null
 ): Promise<boolean> {
 	const id = randomUUID();
 	const path = `${itemDir(values.projectId, values.itemId)}/${id}.${extension}`;
@@ -36,42 +45,47 @@ async function storeInstance(
 	if (!inserted) return false;
 	try {
 		await writeStoredFile(path, bytes);
+		if (pdf) await writeStoredFile(pdfPath(path), pdf);
 	} catch (error) {
 		await db.delete(instance).where(eq(instance.id, id));
 		await removeStored(path);
+		if (pdf) await removeStored(pdfPath(path));
 		throw error;
 	}
 	return true;
 }
 
-async function ingestStl(
+/** Adds an STL model, photo or PDF file as an item of its own, deduplicated by content. */
+async function ingestPlainFile(
 	projectId: string,
+	kind: PlainKind,
 	filename: string,
-	bytes: Uint8Array
+	bytes: Uint8Array,
+	extension: string
 ): Promise<IngestResult> {
-	const sopInstanceUid = `stl:${createHash('sha256').update(bytes).digest('hex')}`;
-	if (await instanceExists(projectId, sopInstanceUid)) return { status: 'duplicate', kind: 'stl' };
+	const sopInstanceUid = `${kind}:${createHash('sha256').update(bytes).digest('hex')}`;
+	if (await instanceExists(projectId, sopInstanceUid)) return { status: 'duplicate', kind };
 
 	const [created] = await db
 		.insert(item)
 		.values({
 			projectId,
-			kind: 'stl',
-			label: stlLabel(filename),
-			modality: 'STL',
+			kind,
+			label: fileLabel(filename, PLAIN_LABELS[kind]),
+			modality: kind === 'stl' ? 'STL' : null,
 			instanceCount: 1
 		})
 		.returning({ id: item.id });
 	const stored = await storeInstance(
 		{ projectId, itemId: created.id, sopInstanceUid },
-		'stl',
+		extension,
 		bytes
 	);
 	if (!stored) {
 		await db.delete(item).where(eq(item.id, created.id));
-		return { status: 'duplicate', kind: 'stl' };
+		return { status: 'duplicate', kind };
 	}
-	return { status: 'added', kind: 'stl' };
+	return { status: 'added', kind };
 }
 
 async function seriesItemId(
@@ -93,7 +107,11 @@ async function seriesItemId(
 	return existing.id;
 }
 
-/** Adds one uploaded file (DICOM instance or STL mesh) to a project. */
+/**
+ * Adds one uploaded file (DICOM instance, STL mesh, photo or PDF) to a project. `filename` is the
+ * path relative to the upload; photos and PDFs inside folders are skipped, because exported DICOM
+ * folders and patient CDs carry viewer icons and manuals.
+ */
 export async function ingestFile(
 	projectId: string,
 	filename: string,
@@ -101,8 +119,16 @@ export async function ingestFile(
 ): Promise<IngestResult> {
 	if (/\.stl$/i.test(filename)) {
 		return isStl(bytes)
-			? ingestStl(projectId, filename, bytes)
+			? ingestPlainFile(projectId, 'stl', filename, bytes, 'stl')
 			: { status: 'skipped', reason: 'invalid STL file' };
+	}
+
+	if (!isDicomPart10(bytes)) {
+		const plain = detectPlainFile(bytes);
+		if (!plain) return { status: 'skipped', reason: 'unsupported file type' };
+		if (/[/\\]/.test(filename))
+			return { status: 'skipped', reason: 'photo or PDF inside a folder' };
+		return ingestPlainFile(projectId, plain.kind, filename, bytes, plain.extension);
 	}
 
 	const parsed = parseDicom(bytes);
@@ -117,6 +143,7 @@ export async function ingestFile(
 		label:
 			dicom.seriesDescription ??
 			dicom.sr?.title ??
+			dicom.documentTitle ??
 			`${dicom.modality ?? 'Series'} ${dicom.seriesNumber ?? ''}`.trim(),
 		modality: dicom.modality,
 		sopClassUid: dicom.sopClassUid,
@@ -136,7 +163,8 @@ export async function ingestFile(
 			srContent: dicom.sr
 		},
 		'dcm',
-		bytes
+		bytes,
+		dicom.pdf
 	);
 	return { status: stored ? 'added' : 'duplicate', kind: dicom.kind };
 }
@@ -166,7 +194,7 @@ export async function finalizeProject(projectId: string): Promise<void> {
 				.update(item)
 				.set({ instanceCount: instances.length, volume: kind === 'image' && layout.volume })
 				.where(eq(item.id, id));
-			if (kind === 'stl') return;
+			if (kind === 'stl' || kind === 'photo') return;
 			const rows = [...layout.sortKeys].map(
 				([instanceId, key]) => sql`(${instanceId}::uuid, ${key}::double precision)`
 			);

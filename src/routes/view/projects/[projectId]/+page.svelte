@@ -14,8 +14,10 @@
 	import { NativeSelect, NativeSelectOption } from '#lib/components/ui/native-select/index.js';
 	import * as Segmented from '#lib/components/segmented/index.js';
 	import {
+		FILES_KEY,
 		formatStudyDate,
 		isDoseReport,
+		MODELS_KEY,
 		matchesFilter,
 		type CatalogItem,
 		type CatalogProject,
@@ -47,7 +49,9 @@
 		{ value: 'volumes', label: '3D volumes' },
 		{ value: 'images', label: 'Images' },
 		{ value: 'reports', label: 'Reports' },
-		{ value: 'models', label: '3D models' }
+		{ value: 'models', label: '3D models' },
+		{ value: 'photos', label: 'Photos' },
+		{ value: 'documents', label: 'Documents' }
 	];
 
 	const project = $derived(data.catalog.find((p) => p.id === page.params.projectId)!);
@@ -80,7 +84,7 @@
 	});
 
 	function summary(p: CatalogProject): string {
-		const visits = p.studies.filter((s) => s.key !== 'stl').length;
+		const visits = p.studies.filter((s) => s.key !== MODELS_KEY && s.key !== FILES_KEY).length;
 		const dates = p.studies.map((s) => s.date).filter((d): d is string => Boolean(d));
 		const range = dates.length
 			? [formatStudyDate(dates.at(-1)!), formatStudyDate(dates[0])]

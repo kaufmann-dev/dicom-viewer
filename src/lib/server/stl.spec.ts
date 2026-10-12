@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isStl, stlLabel } from './stl';
+import { isStl } from './stl';
 
 function binaryStl(triangles: number): Uint8Array {
 	const bytes = new Uint8Array(84 + triangles * 50);
@@ -16,11 +16,5 @@ describe('isStl', () => {
 	it('rejects truncated or unrelated files', () => {
 		expect(isStl(binaryStl(2).subarray(0, 120))).toBe(false);
 		expect(isStl(new TextEncoder().encode('not a mesh'))).toBe(false);
-	});
-});
-
-describe('stlLabel', () => {
-	it('uses the file name without extension', () => {
-		expect(stlLabel('models/Skull Bone.STL')).toBe('Skull Bone');
 	});
 });

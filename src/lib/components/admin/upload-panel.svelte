@@ -156,8 +156,9 @@
 	ondrop={onDrop}
 >
 	<p class="text-sm">
-		Drop DICOM folders or STL files here, or choose them. DICOM files are recognized by content, so
-		folders without file extensions work too.
+		Drop DICOM folders here, or STL models, photos (JPEG, PNG, GIF, WebP, AVIF) and PDFs as
+		individual files, or choose them. DICOM files are recognized by content, so folders without file
+		extensions work too. Photos and PDFs inside folders are skipped.
 	</p>
 	<div class="mt-4 flex flex-wrap gap-2">
 		<Button variant="outline" disabled={running} onclick={() => folderInput.click()}>
@@ -199,7 +200,7 @@
 				<Progress class="mt-2" value={done} max={total} />
 			{/if}
 			<p class="mt-2 text-xs text-muted-foreground">
-				{tally.added} added · {tally.duplicate} already present · {tally.skipped} not DICOM or STL{#if tally.failed}
+				{tally.added} added · {tally.duplicate} already present · {tally.skipped} skipped{#if tally.failed}
 					· <span class="text-destructive">{tally.failed} failed</span>{/if}
 			</p>
 			{#if !running && previews?.failed}

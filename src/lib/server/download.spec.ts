@@ -51,8 +51,8 @@ describe('downloads', () => {
 			row({ itemId: 'series-2' }),
 			row({ itemId: 'other-study', studyInstanceUid: '9.9' }),
 			row({ itemId: 'undated', studyInstanceUid: null, studyDate: null, studyDescription: null }),
-			row({ itemId: 'stl-1', kind: 'stl', label: 'Femur' }),
-			row({ itemId: 'stl-2', kind: 'stl', label: 'femur' })
+			row({ itemId: 'stl-1', kind: 'stl', label: 'Femur', path: 'p/a.stl' }),
+			row({ itemId: 'stl-2', kind: 'stl', label: 'femur', path: 'p/b.stl' })
 		]).map((e) => e.name);
 		expect(names).toEqual([
 			'Knee/2025-01-13 CT Knee/003 Axial 1mm/IM00001.dcm',
@@ -61,6 +61,22 @@ describe('downloads', () => {
 			'Knee/Unknown study/003 Axial 1mm/IM00001.dcm',
 			'Knee/3D models/Femur.stl',
 			'Knee/3D models/femur (2).stl'
+		]);
+	});
+
+	it('puts photos and PDF files under Photos & documents, and keeps DICOM PDFs in their study', () => {
+		const files = { studyInstanceUid: null, studyDate: null, studyDescription: null };
+		const names = archiveEntries([
+			row({ ...files, itemId: 'photo-1', kind: 'photo', label: 'Wound', path: 'p/a.jpg' }),
+			row({ ...files, itemId: 'photo-2', kind: 'photo', label: 'wound', path: 'p/b.jpg' }),
+			row({ ...files, itemId: 'pdf-1', kind: 'pdf', label: 'Referral', path: 'p/c.pdf' }),
+			row({ itemId: 'dicom-pdf', kind: 'pdf', label: 'Scan', seriesNumber: 7 })
+		]).map((e) => e.name);
+		expect(names).toEqual([
+			'Knee/Photos & documents/Wound.jpg',
+			'Knee/Photos & documents/wound (2).jpg',
+			'Knee/Photos & documents/Referral.pdf',
+			'Knee/2025-01-13 CT Knee/007 Scan/IM00001.dcm'
 		]);
 	});
 

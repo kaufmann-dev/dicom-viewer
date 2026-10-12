@@ -17,7 +17,7 @@
 
 <h1 class="text-2xl font-semibold tracking-tight">Projects</h1>
 <p class="mt-1 text-sm text-muted-foreground">
-	A project holds uploaded DICOM folders and STL models.
+	A project holds uploaded DICOM folders, STL models, photos and PDFs.
 </p>
 
 <form method="POST" action="?/create" class="mt-6 flex max-w-lg gap-2" use:enhance>

@@ -1,12 +1,15 @@
+import type { ItemKind } from '#lib/catalog.js';
 import { DOSE_SR_SOP_CLASS } from '#lib/sr.js';
 
 export function itemKindLabel(item: {
-	kind: 'image' | 'sr' | 'stl';
+	kind: ItemKind;
 	volume: boolean;
 	sopClassUid: string | null;
 	instanceCount: number;
 }): string {
 	if (item.kind === 'stl') return '3D model';
+	if (item.kind === 'photo') return 'Photo';
+	if (item.kind === 'pdf') return 'PDF document';
 	if (item.kind === 'sr') return item.sopClassUid === DOSE_SR_SOP_CLASS ? 'Dose report' : 'Report';
 	if (item.volume) return '3D volume';
 	return item.instanceCount === 1 ? 'Image' : 'Image stack';

@@ -2,6 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { parseDicom } from './parse';
 import { ctSlice, writeDicom } from './test-utils';
 
+function encapsulatedPdf(overrides: Record<string, unknown>) {
+	return {
+		SOPClassUID: '1.2.840.10008.5.1.4.1.1.104.1',
+		SOPInstanceUID: '1.2.7',
+		StudyInstanceUID: '1.2.3.4',
+		SeriesInstanceUID: '1.2.7.1',
+		Modality: 'DOC',
+		MIMETypeOfEncapsulatedDocument: 'application/pdf',
+		DocumentTitle: 'Referral',
+		...overrides
+	};
+}
+
 describe('parseDicom', () => {
 	it('reads image identifiers and geometry', () => {
 		const result = parseDicom(writeDicom(ctSlice(2)));
@@ -53,6 +66,31 @@ describe('parseDicom', () => {
 		expect(result.ok && result.dicom.sr?.content[0]).toMatchObject({
 			name: 'Findings',
 			value: 'No fracture.'
+		});
+	});
+
+	it('extracts the document of an Encapsulated PDF', () => {
+		const pdf = new TextEncoder().encode('%PDF-1.4\n%%EOF\n\n');
+		const result = parseDicom(writeDicom(encapsulatedPdf({ EncapsulatedDocument: [pdf.buffer] })));
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.dicom).toMatchObject({ kind: 'pdf', documentTitle: 'Referral', modality: 'DOC' });
+		expect(result.dicom.pdf).toEqual(pdf);
+	});
+
+	it('skips encapsulated documents that are not PDFs', () => {
+		const pdf = new TextEncoder().encode('%PDF-1.4\n%%EOF\n\n');
+		const cda = encapsulatedPdf({
+			MIMETypeOfEncapsulatedDocument: 'text/XML',
+			EncapsulatedDocument: [pdf.buffer]
+		});
+		const empty = encapsulatedPdf({
+			EncapsulatedDocument: [new TextEncoder().encode('not a pdf!').buffer]
+		});
+		expect(parseDicom(writeDicom(cda)).ok).toBe(false);
+		expect(parseDicom(writeDicom(empty))).toEqual({
+			ok: false,
+			reason: 'empty encapsulated document'
 		});
 	});
 

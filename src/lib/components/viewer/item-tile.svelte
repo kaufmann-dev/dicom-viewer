@@ -2,6 +2,7 @@
 	import type { Attachment } from 'svelte/attachments';
 	import { resolve } from '$app/paths';
 	import BoxIcon from '@lucide/svelte/icons/box';
+	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import ImageOffIcon from '@lucide/svelte/icons/image-off';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -55,9 +56,12 @@
 		};
 	};
 
-	const Icon = $derived(
-		failed ? ImageOffIcon : item.kind === 'stl' ? BoxIcon : item.volume ? LayersIcon : ImageIcon
-	);
+	const Icon = $derived.by(() => {
+		if (failed) return ImageOffIcon;
+		if (item.kind === 'stl') return BoxIcon;
+		if (item.kind === 'pdf') return FileTextIcon;
+		return item.volume ? LayersIcon : ImageIcon;
+	});
 	const detail = $derived(
 		[itemTypeText(item), item.instanceCount > 1 ? `${item.instanceCount} images` : null]
 			.filter(Boolean)

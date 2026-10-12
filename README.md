@@ -1,9 +1,9 @@
 # Scans
 
 A private web viewer for your own medical imaging. The owner signs in as admin through OIDC,
-uploads DICOM folders and STL models into projects, and creates expiring passcodes. Each
-passcode opens only the DICOM series and STL models selected for it. The people you give a
-passcode to, such as your doctors, get a read-only viewer:
+uploads DICOM folders, STL models, photos and PDFs into projects, and creates expiring
+passcodes. Each passcode opens only the items selected for it. The people you give a passcode to,
+such as your doctors, get a read-only viewer:
 
 - **CT/MR volumes:** 3D MPR (axial, sagittal, coronal) with crosshairs, plus a 3D volume
   rendering with presets and, for CT, an adjustable HU threshold
@@ -12,14 +12,22 @@ passcode to, such as your doctors, get a read-only viewer:
 - **Structured reports:** DICOM SR text reports and radiation dose reports, rendered as readable
   text
 - **STL models:** 3D viewer with orbit, pan and zoom
+- **Photos:** JPEG, PNG, GIF, WebP and AVIF, fitted to the screen, with wheel or pinch zoom and
+  drag pan
+- **PDF documents:** PDF files and DICOM Encapsulated PDFs, rendered inside the page with PDF.js
+  (scrolling pages, zoom, page indicator) on desktop and mobile
 
 All three image viewers provide window/level, pan, zoom and length measurement.
 
 The admin, and viewers whose passcode allows it, can download a series, a study or a whole
 project. DICOM downloads are ZIP files organized as `Project/Study/Series/IM00001.dcm` in slice
-order, with STL models under `Project/3D models/`. A single STL model downloads as the `.stl` file.
+order, with STL models under `Project/3D models/` and photos and PDF files under
+`Project/Photos & documents/`. A single STL model, photo or PDF file downloads as the file itself.
+A DICOM Encapsulated PDF downloads as DICOM, like any other series.
 
 DICOM files are recognized by content, so folders without file extensions or a DICOMDIR work.
+Photos and PDFs are imported only when chosen or dropped as individual files. Inside an uploaded
+folder they are skipped, so the viewer icons and manuals on patient CDs do not become items.
 JPEG Lossless, JPEG, JPEG-LS, JPEG 2000, HTJ2K, RLE and uncompressed transfer syntaxes are
 decoded in the browser by Cornerstone3D.
 
@@ -87,7 +95,7 @@ After five wrong passcodes, an IP address is blocked for 15 minutes.
 | Variable             | Required | Description                                                                                                       |
 | -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`       | Yes      | PostgreSQL connection string                                                                                      |
-| `DATA_DIR`           | Yes      | Directory for uploaded DICOM and STL files; must be persistent                                                    |
+| `DATA_DIR`           | Yes      | Directory for uploaded DICOM, STL, photo and PDF files; must be persistent                                        |
 | `ORIGIN`             | Yes      | Public origin of the app, e.g. `https://scans.kaufmann.dev`; also needed at build time (SvelteKit `paths.origin`) |
 | `BETTER_AUTH_URL`    | Yes      | Same value as `ORIGIN`                                                                                            |
 | `BETTER_AUTH_SECRET` | Yes      | At least 32 random characters                                                                                     |
@@ -145,5 +153,7 @@ Main code locations:
   ordering, MPR eligibility and SR extraction
 - `src/lib/server/viewer-auth.ts` and `src/lib/server/access.ts`: passcode sessions and access
   checks
-- `src/lib/viewer/`: Cornerstone3D, SR and STL viewers
+- `src/lib/server/file-types.ts`: recognizing photos and PDFs by content, and stored file types
+- `src/lib/viewer/`: Cornerstone3D, SR, STL, photo (`photo-viewer.svelte`) and PDF
+  (`pdf-viewer.svelte`, PDF.js) viewers
 - `src/routes/admin/`: project and passcode management

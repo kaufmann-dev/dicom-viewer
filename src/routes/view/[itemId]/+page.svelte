@@ -8,6 +8,8 @@
 	import { formatDicomDate } from '#lib/sr.js';
 	import DicomStackViewer from '#lib/viewer/dicom-stack-viewer.svelte';
 	import DicomVolumeViewer from '#lib/viewer/dicom-volume-viewer.svelte';
+	import PdfViewer from '#lib/viewer/pdf-viewer.svelte';
+	import PhotoViewer from '#lib/viewer/photo-viewer.svelte';
 	import SrReport from '#lib/viewer/sr-report.svelte';
 	import StlViewer from '#lib/viewer/stl-viewer.svelte';
 	import type { PageProps } from './$types';
@@ -57,6 +59,10 @@
 		<StlViewer instanceId={data.instanceIds[0]} />
 	{:else if item.kind === 'sr'}
 		<SrReport reports={data.reports} />
+	{:else if item.kind === 'photo'}
+		<PhotoViewer instanceId={data.instanceIds[0]} />
+	{:else if item.kind === 'pdf'}
+		<PdfViewer instanceId={data.instanceIds[0]} />
 	{:else if item.volume}
 		<DicomVolumeViewer instanceIds={data.instanceIds} modality={item.modality} />
 	{:else}

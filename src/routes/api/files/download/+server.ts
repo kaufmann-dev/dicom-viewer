@@ -3,19 +3,22 @@ import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
 import { downloadZip, predictLength } from 'client-zip';
 import { downloadRows, type DownloadFilter } from '#lib/server/access.js';
+import { groupName, studyKey } from '#lib/catalog.js';
 import {
 	archiveEntries,
 	contentDisposition,
 	downloadFilename,
 	isoDate,
+	isPlainFile,
 	type ArchiveEntry,
 	type DownloadRow
 } from '#lib/server/download.js';
+import { contentTypeFor, storedExtension } from '#lib/server/file-types.js';
 import { resolveStoredPath } from '#lib/server/storage.js';
 import { idSchema } from '#lib/server/validation.js';
 import type { RequestHandler } from './$types';
 
-/** `?item=<id>`, `?project=<id>` or `?project=<id>&study=<StudyInstanceUID | stl>`. */
+/** `?item=<id>`, `?project=<id>` or `?project=<id>&study=<StudyInstanceUID | stl | files>`. */
 function parseFilter(params: URLSearchParams): DownloadFilter | null {
 	const itemId = params.get('item');
 	const projectId = params.get('project');
@@ -43,7 +46,8 @@ async function* zipInputs(entries: ArchiveEntry[]) {
 function filenameParts(filter: DownloadFilter, first: DownloadRow): (string | null)[] {
 	if ('itemId' in filter) return [first.projectName, isoDate(first.studyDate), first.label];
 	if (filter.study === undefined) return [first.projectName];
-	if (first.kind === 'stl') return [first.projectName, '3D models'];
+	const group = groupName(studyKey(first));
+	if (group) return [first.projectName, group];
 	return [first.projectName, isoDate(first.studyDate) || first.studyDescription];
 }
 
@@ -55,12 +59,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 	const first = rows[0];
 	const parts = filenameParts(filter, first);
-	if ('itemId' in filter && first.kind === 'stl') {
+	// A single STL model, photo or PDF downloads as the file itself.
+	if ('itemId' in filter && isPlainFile(first)) {
 		return new Response(fileStream(first.path), {
 			headers: {
-				'content-type': 'model/stl',
+				'content-type': contentTypeFor(first.path),
 				'content-length': String(first.size),
-				'content-disposition': contentDisposition(downloadFilename(parts, '.stl')),
+				'content-disposition': contentDisposition(
+					downloadFilename(parts, storedExtension(first.path))
+				),
 				'cache-control': 'private, no-store'
 			}
 		});

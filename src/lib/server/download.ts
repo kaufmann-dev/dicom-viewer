@@ -1,8 +1,11 @@
+import { groupName, studyKey, type ItemKind } from '#lib/catalog.js';
+import { storedExtension } from '#lib/server/file-types.js';
+
 /** One stored file selected for download, with the metadata that names it in the archive. */
 export type DownloadRow = {
 	projectName: string;
 	itemId: string;
-	kind: 'image' | 'sr' | 'stl';
+	kind: ItemKind;
 	label: string;
 	seriesNumber: number | null;
 	studyInstanceUid: string | null;
@@ -54,8 +57,17 @@ function uniqueNamer() {
 	};
 }
 
+/** Whether the item is a single uploaded file (STL, photo or PDF) rather than a DICOM series. */
+export function isPlainFile(row: Pick<DownloadRow, 'kind' | 'path'>): boolean {
+	if (row.kind === 'pdf') return storedExtension(row.path) === '.pdf';
+	return row.kind === 'stl' || row.kind === 'photo';
+}
+
+const PLAIN_FALLBACK: Partial<Record<ItemKind, string>> = { stl: 'Model', photo: 'Photo' };
+
 function studyFolder(row: DownloadRow): string {
-	if (row.kind === 'stl') return '3D models';
+	const group = groupName(studyKey(row));
+	if (group) return group;
 	const text = [isoDate(row.studyDate), row.studyDescription].filter(Boolean).join(' ');
 	return safeName(text, 'Unknown study');
 }
@@ -67,21 +79,19 @@ function seriesFolder(row: DownloadRow): string {
 
 /**
  * Lays out rows as Project/Study/Series/IM00001.dcm, numbering instances in row order, with STL
- * models under Project/3D models. Rows of one item must be consecutive and in slice order.
+ * models under Project/3D models and photos and PDF files under Project/Photos & documents. Rows of
+ * one item must be consecutive and in slice order.
  */
 export function archiveEntries(rows: DownloadRow[]): ArchiveEntry[] {
 	const name = uniqueNamer();
 	const counts = new Map<string, number>();
 	return rows.map((row) => {
 		const root = safeName(row.projectName, 'Project');
-		const studyKey = row.kind === 'stl' ? 'stl' : (row.studyInstanceUid ?? 'unknown');
-		const dir = `${root}/${name(root, studyKey, studyFolder(row))}`;
+		const dir = `${root}/${name(root, studyKey(row), studyFolder(row))}`;
 		const entry = { path: row.path, size: row.size, lastModified: row.createdAt };
-		if (row.kind === 'stl') {
-			return {
-				...entry,
-				name: `${dir}/${name(dir, row.itemId, safeName(row.label, 'Model'), '.stl')}`
-			};
+		if (isPlainFile(row)) {
+			const base = safeName(row.label, PLAIN_FALLBACK[row.kind] ?? 'Document');
+			return { ...entry, name: `${dir}/${name(dir, row.itemId, base, storedExtension(row.path))}` };
 		}
 		const series = name(dir, row.itemId, seriesFolder(row));
 		const index = (counts.get(row.itemId) ?? 0) + 1;

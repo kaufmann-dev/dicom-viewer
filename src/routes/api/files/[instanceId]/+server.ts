@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { canAccessItem } from '#lib/server/access.js';
 import { db } from '#lib/server/db/index.js';
 import { instance } from '#lib/server/db/schema.js';
+import { contentTypeFor } from '#lib/server/file-types.js';
 import { resolveStoredPath } from '#lib/server/storage.js';
 import type { RequestHandler } from './$types';
 
@@ -24,9 +25,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	const body = Readable.toWeb(createReadStream(file)) as ReadableStream;
 	return new Response(body, {
 		headers: {
-			'content-type': row.path.endsWith('.stl') ? 'model/stl' : 'application/dicom',
+			'content-type': contentTypeFor(row.path),
 			'content-length': String(size),
-			'cache-control': 'private, no-store'
+			'cache-control': 'private, no-store',
+			'x-content-type-options': 'nosniff'
 		}
 	});
 };

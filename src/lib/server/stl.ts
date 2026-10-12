@@ -8,8 +8,3 @@ export function isStl(bytes: Uint8Array): boolean {
 	const head = new TextDecoder().decode(bytes.subarray(0, 1024)).trimStart().toLowerCase();
 	return head.startsWith('solid') && head.includes('facet');
 }
-
-export function stlLabel(filename: string): string {
-	const base = filename.split(/[/\\]/).pop() ?? filename;
-	return base.replace(/\.stl$/i, '') || 'Model';
-}

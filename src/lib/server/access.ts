@@ -1,8 +1,12 @@
-import { and, asc, eq, inArray, ne, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, ne, sql, type SQL } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.js';
 import { instance, item, passcodeItem, project } from '#lib/server/db/schema.js';
 import {
+	FILES_KEY,
+	groupName,
 	itemOrder,
+	MODELS_KEY,
+	studyKey,
 	type CatalogItem,
 	type CatalogProject,
 	type MissingThumbnail,
@@ -38,7 +42,10 @@ export function canDownload(locals: App.Locals): boolean {
 
 export type DownloadFilter = { itemId: string } | { projectId: string; study?: string };
 
-/** Stored files the caller may download, in item and slice order. `study: 'stl'` selects 3D models. */
+/**
+ * Stored files the caller may download, in item and slice order. `study: 'stl'` selects 3D models
+ * and `study: 'files'` the uploaded photos and PDF files.
+ */
 export async function downloadRows(
 	locals: App.Locals,
 	filter: DownloadFilter
@@ -47,8 +54,14 @@ export async function downloadRows(
 	let scope: SQL | undefined;
 	if ('itemId' in filter) {
 		scope = eq(item.id, filter.itemId);
-	} else if (filter.study === 'stl') {
+	} else if (filter.study === MODELS_KEY) {
 		scope = and(eq(item.projectId, filter.projectId), eq(item.kind, 'stl'));
+	} else if (filter.study === FILES_KEY) {
+		scope = and(
+			eq(item.projectId, filter.projectId),
+			isNull(item.studyInstanceUid),
+			inArray(item.kind, ['photo', 'pdf'])
+		);
 	} else if (filter.study !== undefined) {
 		scope = and(
 			eq(item.projectId, filter.projectId),
@@ -94,8 +107,9 @@ type CatalogRow = Omit<CatalogItem, 'thumbnail'> & {
 };
 
 /**
- * Groups items by project and study; STL items form their own "3D models" group. Studies are
- * newest first, and projects are ordered by their newest study.
+ * Groups items by project and study; STL items form a "3D models" group, and uploaded photos and
+ * PDF files a "Photos & documents" group. Studies are newest first, and projects are ordered by
+ * their newest study.
  */
 export function groupCatalog(
 	rows: CatalogRow[],
@@ -108,13 +122,14 @@ export function groupCatalog(
 			p = { id: row.projectId, name: row.projectName, studies: [] };
 			projects.set(row.projectId, p);
 		}
-		const key = row.kind === 'stl' ? 'stl' : (row.studyInstanceUid ?? 'unknown');
+		const key = studyKey(row);
 		let study = p.studies.find((s) => s.key === key);
 		if (!study) {
+			const group = groupName(key);
 			study = {
 				key,
-				date: row.kind === 'stl' ? null : row.studyDate,
-				description: row.kind === 'stl' ? '3D models' : row.studyDescription,
+				date: group ? null : row.studyDate,
+				description: group ?? row.studyDescription,
 				items: []
 			};
 			p.studies.push(study);
@@ -150,7 +165,7 @@ export function groupCatalog(
 	);
 }
 
-/** Middle instance (by slice order) of each item; STL items have a single instance. */
+/** Middle instance (by slice order) of each item; STL, photo and PDF file items have one instance. */
 async function middleInstances(itemIds: string[]): Promise<Map<string, ThumbnailRef>> {
 	if (itemIds.length === 0) return new Map();
 	const rows = await db.execute<{ item_id: string; id: string; thumbnail: boolean }>(sql`
@@ -166,7 +181,7 @@ async function middleInstances(itemIds: string[]): Promise<Map<string, Thumbnail
 	return new Map(rows.map((r) => [r.item_id, { instanceId: r.id, stored: r.thumbnail }]));
 }
 
-/** Thumbnails the project's image and STL items still need; the admin's browser renders them. */
+/** Thumbnails the project's items other than reports still need; the admin's browser renders them. */
 export async function missingThumbnails(projectId: string): Promise<MissingThumbnail[]> {
 	const items = await db
 		.select({ id: item.id, kind: item.kind })

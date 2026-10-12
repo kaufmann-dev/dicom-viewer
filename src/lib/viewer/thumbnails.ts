@@ -4,7 +4,7 @@ import { overlayBitmap, overlayPlanes } from './dicom-overlay';
 
 const SIZE = 320;
 
-export type ThumbnailKind = 'image' | 'stl';
+export type ThumbnailKind = 'image' | 'stl' | 'photo' | 'pdf';
 const CONCURRENCY = 4;
 
 /** Rendered thumbnails for this browser session, keyed by instance id. */
@@ -28,16 +28,66 @@ async function render(instanceId: string, kind: ThumbnailKind): Promise<string> 
 		const { renderStlThumbnail } = await import('./stl-thumbnail');
 		return renderStlThumbnail(instanceId, SIZE);
 	}
-	initCornerstone();
 	const canvas = document.createElement('canvas');
 	canvas.width = SIZE;
 	canvas.height = SIZE;
+	if (kind === 'photo') {
+		const image = new Image();
+		image.src = `/api/files/${instanceId}`;
+		await image.decode();
+		drawFitted(canvas, image, image.naturalWidth, image.naturalHeight);
+		return canvas.toDataURL('image/jpeg', 0.85);
+	}
+	if (kind === 'pdf') {
+		const page = await renderFirstPage(instanceId);
+		drawFitted(canvas, page, page.width, page.height);
+		return canvas.toDataURL('image/jpeg', 0.85);
+	}
+	initCornerstone();
 	// CPU rendering: the GPU path shares one hidden rendering engine and stalls when used
 	// concurrently.
 	const imageId = imageIdFor(instanceId);
 	await utilities.loadImageToCanvas({ canvas, imageId, thumbnail: true, useCPURendering: true });
 	drawOverlays(canvas, imageId);
 	return canvas.toDataURL('image/jpeg', 0.85);
+}
+
+/** Draws a source scaled to fit the canvas and centered over black. */
+function drawFitted(
+	canvas: HTMLCanvasElement,
+	source: CanvasImageSource,
+	width: number,
+	height: number
+) {
+	const context = canvas.getContext('2d')!;
+	context.fillStyle = '#000';
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	const scale = Math.min(canvas.width / width, canvas.height / height);
+	context.drawImage(
+		source,
+		(canvas.width - width * scale) / 2,
+		(canvas.height - height * scale) / 2,
+		width * scale,
+		height * scale
+	);
+}
+
+/** The first page of a PDF, rendered to fit the thumbnail size. */
+async function renderFirstPage(instanceId: string): Promise<HTMLCanvasElement> {
+	const { openPdf } = await import('./pdf');
+	const task = await openPdf(instanceId);
+	try {
+		const page = await (await task.promise).getPage(1);
+		const { width, height } = page.getViewport({ scale: 1 });
+		const viewport = page.getViewport({ scale: SIZE / Math.max(width, height) });
+		const canvas = document.createElement('canvas');
+		canvas.width = Math.floor(viewport.width);
+		canvas.height = Math.floor(viewport.height);
+		await page.render({ canvas, viewport }).promise;
+		return canvas;
+	} finally {
+		await task.destroy();
+	}
 }
 
 /** Draws the image's overlay planes where the CPU renderer fitted the image: scaled and centered. */

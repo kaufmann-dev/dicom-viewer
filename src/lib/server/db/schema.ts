@@ -17,7 +17,7 @@ import type { SrDocument } from '#lib/sr.js';
 
 export * from './auth.schema';
 
-export const itemKind = pgEnum('item_kind', ['image', 'sr', 'stl']);
+export const itemKind = pgEnum('item_kind', ['image', 'sr', 'stl', 'photo', 'pdf']);
 
 export const project = pgTable('project', {
 	id: uuid('id').primaryKey().defaultRandom(),
@@ -25,7 +25,10 @@ export const project = pgTable('project', {
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
 });
 
-/** One viewable unit: a DICOM series (image or structured report) or an STL mesh. */
+/**
+ * One viewable unit: a DICOM series (image, structured report or encapsulated PDF), an STL mesh,
+ * a photo or a PDF file.
+ */
 export const item = pgTable(
 	'item',
 	{
@@ -49,7 +52,7 @@ export const item = pgTable(
 	(t) => [unique().on(t.projectId, t.seriesInstanceUid), index().on(t.projectId)]
 );
 
-/** One stored file: a DICOM instance or the STL file of an STL item. */
+/** One stored file: a DICOM instance, or the file of an STL, photo or PDF item. */
 export const instance = pgTable(
 	'instance',
 	{
