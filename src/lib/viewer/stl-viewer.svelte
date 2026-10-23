@@ -17,7 +17,7 @@
 
 	let container: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
-	let phase: 'loading' | 'ready' | 'error' = $state('loading');
+	let phase: 'loading' | 'ready' | 'error' | 'no-webgl' = $state('loading');
 	let progress = $state(0);
 	let wireframe = $state(false);
 
@@ -25,7 +25,15 @@
 	let setWireframe: (value: boolean) => void = () => {};
 
 	onMount(() => {
-		const renderer = new WebGLRenderer({ antialias: true, canvas });
+		let renderer: WebGLRenderer;
+		try {
+			renderer = new WebGLRenderer({ antialias: true, canvas });
+		} catch (error) {
+			// Thrown when WebGL is disabled or the browser has blocked it after GPU crashes.
+			console.error(error);
+			phase = 'no-webgl';
+			return;
+		}
 		renderer.setPixelRatio(window.devicePixelRatio);
 
 		const { scene, camera, material } = createStlScene();
@@ -135,6 +143,11 @@
 		<div class="absolute inset-0 flex items-center justify-center px-4 text-sm text-neutral-200">
 			{#if phase === 'error'}
 				<p role="alert">This model could not be loaded. Reload the page to try again.</p>
+			{:else if phase === 'no-webgl'}
+				<p role="alert">
+					This browser cannot display 3D models right now. Turn on hardware acceleration or restart
+					the browser, then reload the page.
+				</p>
 			{:else}
 				<div class="w-full max-w-xs text-center" role="status">
 					<p>Loading model…</p>
