@@ -6,7 +6,8 @@ passcodes. Each passcode opens only the items selected for it. The people you gi
 such as your doctors, get a read-only viewer:
 
 - **CT/MR volumes:** 3D MPR (axial, sagittal, coronal) with crosshairs, plus a 3D volume
-  rendering with presets and, for CT, an adjustable HU threshold
+  rendering with presets and, for CT, an adjustable HU threshold. Browsers without WebGL get the
+  2D stack viewer instead
 - **Other images:** 2D stack viewer, e.g. for X-rays, topograms and secondary captures, that also
   draws DICOM overlay planes such as the text of CT protocol pages
 - **Structured reports:** DICOM SR text reports and radiation dose reports, rendered as readable

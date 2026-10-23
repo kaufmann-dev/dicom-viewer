@@ -12,6 +12,7 @@
 	import PhotoViewer from '#lib/viewer/photo-viewer.svelte';
 	import SrReport from '#lib/viewer/sr-report.svelte';
 	import StlViewer from '#lib/viewer/stl-viewer.svelte';
+	import { webglAvailable } from '#lib/viewer/webgl.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -20,6 +21,8 @@
 	const study = $derived(
 		[formatDicomDate(item.studyDate), item.studyDescription].filter(Boolean).join(' · ')
 	);
+	// Volume viewports need WebGL; the stack viewer falls back to CPU rendering.
+	const webgl = webglAvailable();
 </script>
 
 <svelte:head><title>{item.label} · Scans</title></svelte:head>
@@ -63,9 +66,18 @@
 		<PhotoViewer instanceId={data.instanceIds[0]} />
 	{:else if item.kind === 'pdf'}
 		<PdfViewer instanceId={data.instanceIds[0]} />
-	{:else if item.volume}
+	{:else if item.volume && webgl}
 		<DicomVolumeViewer instanceIds={data.instanceIds} modality={item.modality} />
 	{:else}
+		{#if item.volume}
+			<p
+				class="shrink-0 border-b bg-background px-3 py-1 text-xs text-muted-foreground"
+				role="status"
+			>
+				This browser cannot display 3D views right now, so only the slices are shown. Turn on
+				hardware acceleration or restart the browser, then reload the page.
+			</p>
+		{/if}
 		<DicomStackViewer instanceIds={data.instanceIds} modality={item.modality} />
 	{/if}
 {/key}

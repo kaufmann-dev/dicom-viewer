@@ -9,8 +9,9 @@ let renderer: WebGLRenderer | undefined;
  * renderer serves all thumbnails, since browsers limit the number of WebGL contexts.
  */
 export async function renderStlThumbnail(instanceId: string, size: number): Promise<string> {
-	const geometry = await new STLLoader().loadAsync(`/api/files/${instanceId}`);
+	// Throws without WebGL, before the model is downloaded.
 	renderer ??= new WebGLRenderer({ antialias: true });
+	const geometry = await new STLLoader().loadAsync(`/api/files/${instanceId}`);
 	renderer.setSize(size, size, false);
 	const { scene, camera, material } = createStlScene();
 	try {

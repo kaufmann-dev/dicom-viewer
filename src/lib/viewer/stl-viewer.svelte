@@ -29,7 +29,6 @@
 		try {
 			renderer = new WebGLRenderer({ antialias: true, canvas });
 		} catch (error) {
-			// Thrown when WebGL is disabled or the browser has blocked it after GPU crashes.
 			console.error(error);
 			phase = 'no-webgl';
 			return;
