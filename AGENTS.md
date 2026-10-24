@@ -33,7 +33,7 @@ pnpm db:generate --name <name>    # After editing src/lib/server/db/schema.ts
 ## Cornerstone3D (v5)
 
 - `@cornerstonejs/dicom-image-loader` is excluded from Vite pre-bundling, and its CommonJS codec dependencies are listed in `optimizeDeps.include`. Keep both lists in sync when upgrading.
-- `pnpm-workspace.yaml` pins dependency patches under `patches/`: vtk.js handles parallel rays without division by zero, and Cornerstone flushes WebGL commands before copying each pooled viewport to its visible canvas. Both address black views on Chrome/ANGLE OpenGL. Revalidate these patches on dependency upgrades.
+- `pnpm-workspace.yaml` patches vtk.js (`patches/`) to handle rays parallel to the volume faces without dividing by zero. Without it, Chrome on ANGLE/NVIDIA OpenGL renders the 3D view and all MPR views black. Upstream fix: Kitware/vtk-js#3701. Drop the patch once Cornerstone ships a vtk.js release that contains it.
 - vtk.js pulls in `xmlbuilder2`, which needs `events`. `pnpm-workspace.yaml` provides it through `packageExtensions`.
 - Register instances with `prefetchPart10Instance` before building volumes. The wadouri loader reads naturalized metadata; `dataSetCacheManager` does not feed it.
 - Stack viewports do not apply the stored VOI automatically. Use `defaultVoiRange`.
