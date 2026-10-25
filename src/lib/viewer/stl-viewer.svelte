@@ -10,6 +10,7 @@
 	import { Toggle } from '#lib/components/ui/toggle/index.js';
 	import { cn } from '#lib/utils.js';
 	import MouseHint from './mouse-hint.svelte';
+	import { rangedDownload } from './ranged-download';
 	import { MOUSE_HINTS_3D } from './mouse-hints';
 	import { addModel, createStlScene, frameModel } from './stl-scene';
 
@@ -77,24 +78,26 @@
 		const resizeObserver = new ResizeObserver(resize);
 		resizeObserver.observe(container);
 
-		new STLLoader().load(
+		const download = new AbortController();
+		rangedDownload(
 			`/api/files/${instanceId}`,
-			(geometry) => {
-				bounds = addModel(scene, geometry, material);
+			(loaded, total) => (progress = (loaded / total) * 100),
+			download.signal
+		)
+			.then((data) => {
+				bounds = addModel(scene, new STLLoader().parse(data), material);
 				resize();
 				resetView();
 				phase = 'ready';
-			},
-			(event) => {
-				if (event.lengthComputable) progress = (event.loaded / event.total) * 100;
-			},
-			(error) => {
+			})
+			.catch((error) => {
+				if (download.signal.aborted) return;
 				console.error(error);
 				phase = 'error';
-			}
-		);
+			});
 
 		return () => {
+			download.abort();
 			cancelAnimationFrame(frame);
 			resizeObserver.disconnect();
 			controls.dispose();

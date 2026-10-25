@@ -1,5 +1,6 @@
 import { Mesh, WebGLRenderer } from 'three';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { rangedDownload } from './ranged-download';
 import { addModel, createStlScene, frameModel } from './stl-scene';
 
 let renderer: WebGLRenderer | undefined;
@@ -11,7 +12,8 @@ let renderer: WebGLRenderer | undefined;
 export async function renderStlThumbnail(instanceId: string, size: number): Promise<string> {
 	// Throws without WebGL, before the model is downloaded.
 	renderer ??= new WebGLRenderer({ antialias: true });
-	const geometry = await new STLLoader().loadAsync(`/api/files/${instanceId}`);
+	const data = await rangedDownload(`/api/files/${instanceId}`);
+	const geometry = new STLLoader().parse(data);
 	renderer.setSize(size, size, false);
 	const { scene, camera, material } = createStlScene();
 	try {
