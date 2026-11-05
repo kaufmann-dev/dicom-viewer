@@ -123,7 +123,8 @@ provider session.
 
 ## Coolify Deployment
 
-- **Build Pack:** Nixpacks (`nixpacks.toml` installs and builds with pnpm 11 and starts `node build`)
+- **Build Pack:** Railpack (installs and builds with the pnpm version from `packageManager`;
+  `railpack.json` starts `node build`)
 - **Base Directory:** `/`
 - **Domain:** `https://scans.kaufmann.dev`
 - **Persistent Storage:** mount a volume at `/data` and set `DATA_DIR=/data`. Include this volume
