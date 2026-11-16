@@ -5,11 +5,6 @@ allowBuilds:
   core-js-pure: false
   esbuild: true
 
-minimumReleaseAgeExclude:
-  - '@sveltejs/adapter-node@6.0.0'
-  - '@sveltejs/kit@3.0.0'
-  - '@better-auth/drizzle-adapter@1.7.7'
-
 # vtk.js (used by Cornerstone3D) bundles xmlbuilder2, which imports Node's `events` module.
 packageExtensions:
   xmlbuilder2:

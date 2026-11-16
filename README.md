@@ -34,7 +34,7 @@ decoded in the browser by Cornerstone3D.
 
 ## Run locally
 
-Prerequisites: Node.js 24, pnpm and Podman.
+Prerequisites: Node.js 26, pnpm 12 and Podman.
 
 1. Install dependencies and create your local environment file:
 
