@@ -20,8 +20,8 @@ such as your doctors, get a read-only viewer:
 
 All three image viewers provide window/level, pan, zoom and length measurement.
 
-The admin, and viewers whose passcode allows it, can download a series, a study or a whole
-project. DICOM downloads are ZIP files organized as `Project/Study/Series/IM00001.dcm` in slice
+The admin, and viewers whose passcode allows it, can download a whole project, a study, or a
+single series, report or file from its button on the overview or in the viewer. DICOM downloads are ZIP files organized as `Project/Study/Series/IM00001.dcm` in slice
 order, with STL models under `Project/3D models/` and photos and PDF files under
 `Project/Photos & documents/`. A single STL model, photo or PDF file downloads as the file itself.
 A DICOM Encapsulated PDF downloads as DICOM, like any other series.

@@ -9,6 +9,7 @@
 	import LegalLinks from '#lib/components/legal-links.svelte';
 	import ItemTile from '#lib/components/viewer/item-tile.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { ButtonGroup } from '#lib/components/ui/button-group/index.js';
 	import { downloadHref } from '#lib/download.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { NativeSelect, NativeSelectOption } from '#lib/components/ui/native-select/index.js';
@@ -100,6 +101,33 @@
 </script>
 
 <svelte:head><title>{project.name} · Scans</title></svelte:head>
+
+{#snippet reportLink(report: CatalogItem, label: string, variant: 'outline' | 'ghost')}
+	{@const tone = variant === 'ghost' ? 'text-muted-foreground' : undefined}
+	{#snippet open()}
+		<Button {variant} size="sm" class={tone} href={itemHref(report)}>
+			<FileTextIcon />{label}
+		</Button>
+	{/snippet}
+	{#if data.canDownload}
+		<ButtonGroup>
+			{@render open()}
+			<Button
+				{variant}
+				size="icon-sm"
+				class={tone}
+				href={downloadHref({ item: report.id })}
+				download
+				aria-label="Download {label}"
+				title="Download"
+			>
+				<DownloadIcon />
+			</Button>
+		</ButtonGroup>
+	{:else}
+		{@render open()}
+	{/if}
+{/snippet}
 
 <div class="flex min-h-0 flex-1">
 	{#if data.catalog.length > 1}
@@ -228,7 +256,11 @@
 					{#if study.tiles.length}
 						<div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
 							{#each study.tiles as item (item.id)}
-								<ItemTile {item} storeThumbnails={data.role === 'admin'} />
+								<ItemTile
+									{item}
+									storeThumbnails={data.role === 'admin'}
+									download={data.canDownload}
+								/>
 							{/each}
 						</div>
 					{/if}
@@ -236,19 +268,18 @@
 					{#if study.reports.length || study.doseReports.length}
 						<div class="mt-4 flex flex-wrap gap-2">
 							{#each study.reports as report (report.id)}
-								<Button variant="outline" size="sm" href={itemHref(report)}>
-									<FileTextIcon />{report.label === 'Report' ? 'Radiology report' : report.label}
-								</Button>
+								{@render reportLink(
+									report,
+									report.label === 'Report' ? 'Radiology report' : report.label,
+									'outline'
+								)}
 							{/each}
 							{#each study.doseReports as report, i (report.id)}
-								<Button
-									variant="ghost"
-									size="sm"
-									class="text-muted-foreground"
-									href={itemHref(report)}
-								>
-									<FileTextIcon />Dose report{study.doseReports.length > 1 ? ` ${i + 1}` : ''}
-								</Button>
+								{@render reportLink(
+									report,
+									`Dose report${study.doseReports.length > 1 ? ` ${i + 1}` : ''}`,
+									'ghost'
+								)}
 							{/each}
 						</div>
 					{/if}

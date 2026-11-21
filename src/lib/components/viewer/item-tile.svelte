@@ -2,15 +2,21 @@
 	import type { Attachment } from 'svelte/attachments';
 	import { resolve } from '$app/paths';
 	import BoxIcon from '@lucide/svelte/icons/box';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import ImageOffIcon from '@lucide/svelte/icons/image-off';
 	import LayersIcon from '@lucide/svelte/icons/layers';
 	import type { CatalogItem } from '#lib/catalog.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { downloadHref } from '#lib/download.js';
 	import { itemTypeText } from '#lib/item-kind.js';
 
-	let { item, storeThumbnails = false }: { item: CatalogItem; storeThumbnails?: boolean } =
-		$props();
+	let {
+		item,
+		storeThumbnails = false,
+		download = false
+	}: { item: CatalogItem; storeThumbnails?: boolean; download?: boolean } = $props();
 
 	let rendered: string | null = $state(null);
 	let storedFailed = $state(false);
@@ -69,34 +75,49 @@
 	);
 </script>
 
-<a
-	href={resolve('/view/[itemId]', { itemId: item.id })}
-	class="group flex min-w-0 flex-col rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
->
-	<div
-		class="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-black text-neutral-500"
-		{@attach lazyThumbnail}
+<div class="relative min-w-0">
+	<a
+		href={resolve('/view/[itemId]', { itemId: item.id })}
+		class="group flex min-w-0 flex-col rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 	>
-		{#if src}
-			<img
-				{src}
-				alt=""
-				loading="lazy"
-				decoding="async"
-				class="h-full w-full object-contain"
-				onerror={() => (storedFailed = true)}
-			/>
-		{:else}
-			<Icon class="size-10" aria-hidden="true" />
-		{/if}
-		{#if item.volume}
-			<span
-				class="absolute top-2 left-2 rounded-md bg-white/85 px-1.5 py-0.5 text-xs font-semibold text-neutral-800"
-			>
-				3D
-			</span>
-		{/if}
-	</div>
-	<span class="mt-2 truncate text-sm font-medium group-hover:underline">{item.label}</span>
-	<span class="truncate text-xs text-muted-foreground">{detail}</span>
-</a>
+		<div
+			class="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-black text-neutral-500"
+			{@attach lazyThumbnail}
+		>
+			{#if src}
+				<img
+					{src}
+					alt=""
+					loading="lazy"
+					decoding="async"
+					class="h-full w-full object-contain"
+					onerror={() => (storedFailed = true)}
+				/>
+			{:else}
+				<Icon class="size-10" aria-hidden="true" />
+			{/if}
+			{#if item.volume}
+				<span
+					class="absolute top-2 left-2 rounded-md bg-white/85 px-1.5 py-0.5 text-xs font-semibold text-neutral-800"
+				>
+					3D
+				</span>
+			{/if}
+		</div>
+		<span class="mt-2 truncate text-sm font-medium group-hover:underline">{item.label}</span>
+		<span class="truncate text-xs text-muted-foreground">{detail}</span>
+	</a>
+	{#if download}
+		<Button
+			variant="ghost"
+			size="icon-sm"
+			href={downloadHref({ item: item.id })}
+			download
+			aria-label="Download {item.label}"
+			title="Download"
+			class="absolute top-2 right-2 rounded-md bg-white/85 text-neutral-800 hover:bg-white hover:text-neutral-800 dark:hover:bg-white"
+		>
+			<DownloadIcon />
+		</Button>
+	{/if}
+</div>
