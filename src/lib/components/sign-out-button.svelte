@@ -20,8 +20,8 @@
 	</Button>
 {:else}
 	<form method="POST" action="/logout">
-		<Button type="submit" variant="ghost" size="sm" aria-label="Sign out"
-			><LogOutIcon /><span class="hidden sm:inline">Sign out</span></Button
-		>
+		<Button type="submit" variant="ghost" size="sm" aria-label="Sign out">
+			<LogOutIcon /><span class="hidden sm:inline">Sign out</span>
+		</Button>
 	</form>
 {/if}

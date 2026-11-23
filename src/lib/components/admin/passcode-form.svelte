@@ -197,8 +197,9 @@
 											onCheckedChange={(checked) => setAll([item.id], checked)}
 										/>
 										<span class="min-w-0 flex-1 truncate">{item.label}</span>
-										<span class="shrink-0 text-xs text-muted-foreground">{itemKindLabel(item)}</span
-										>
+										<span class="shrink-0 text-xs text-muted-foreground">
+											{itemKindLabel(item)}
+										</span>
 									</label>
 								</li>
 							{/each}

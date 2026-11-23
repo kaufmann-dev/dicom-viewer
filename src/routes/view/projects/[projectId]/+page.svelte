@@ -226,8 +226,10 @@
 						onclick={() => {
 							query = '';
 							filter = 'all';
-						}}>Show everything</Button
+						}}
 					>
+						Show everything
+					</Button>
 				</div>
 			{/if}
 

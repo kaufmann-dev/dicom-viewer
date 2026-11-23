@@ -70,9 +70,9 @@
 		<Table.Body>
 			{#each data.passcodes as passcode (passcode.id)}
 				<Table.Row class={passcode.expired ? 'text-muted-foreground' : ''}>
-					<Table.Cell class="w-full max-w-0"
-						><span class="block truncate">{passcode.label}</span></Table.Cell
-					>
+					<Table.Cell class="w-full max-w-0">
+						<span class="block truncate">{passcode.label}</span>
+					</Table.Cell>
 					<Table.Cell>
 						<div class="flex items-center gap-1">
 							<code class="font-mono tracking-widest">{passcode.code}</code>

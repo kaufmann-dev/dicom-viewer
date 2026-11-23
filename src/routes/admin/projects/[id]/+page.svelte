@@ -24,9 +24,9 @@
 
 <svelte:head><title>{data.project.name} · Scans</title></svelte:head>
 
-<Button variant="ghost" size="sm" href={resolve('admin/projects')} class="-ml-2"
-	><ArrowLeftIcon />Projects</Button
->
+<Button variant="ghost" size="sm" href={resolve('admin/projects')} class="-ml-2">
+	<ArrowLeftIcon />Projects
+</Button>
 
 <div class="mt-4 flex items-center gap-2">
 	{#if renamingProject}
@@ -46,8 +46,10 @@
 				variant="ghost"
 				size="icon"
 				aria-label="Cancel renaming"
-				onclick={() => (renamingProject = false)}><XIcon /></Button
+				onclick={() => (renamingProject = false)}
 			>
+				<XIcon />
+			</Button>
 		</form>
 	{:else}
 		<h1 class="min-w-0 truncate text-2xl font-semibold tracking-tight">{data.project.name}</h1>
@@ -55,8 +57,10 @@
 			variant="ghost"
 			size="icon-sm"
 			aria-label="Rename project"
-			onclick={() => (renamingProject = true)}><PencilIcon /></Button
+			onclick={() => (renamingProject = true)}
 		>
+			<PencilIcon />
+		</Button>
 
 		<span class="flex-1"></span>
 		{#if data.items.length}
@@ -118,14 +122,18 @@
 									variant="ghost"
 									size="icon"
 									aria-label="Cancel renaming"
-									onclick={() => (editingItem = null)}><XIcon /></Button
+									onclick={() => (editingItem = null)}
 								>
+									<XIcon />
+								</Button>
 							</form>
 						{:else}
 							<a
 								class="block truncate hover:underline"
-								href={resolve('/view/[itemId]', { itemId: item.id })}>{item.label}</a
+								href={resolve('/view/[itemId]', { itemId: item.id })}
 							>
+								{item.label}
+							</a>
 						{/if}
 					</Table.Cell>
 					<Table.Cell class="whitespace-nowrap">
@@ -139,8 +147,10 @@
 								variant="ghost"
 								size="icon-sm"
 								aria-label="Rename {item.label}"
-								onclick={() => (editingItem = item.id)}><PencilIcon /></Button
+								onclick={() => (editingItem = item.id)}
 							>
+								<PencilIcon />
+							</Button>
 
 							<ConfirmDelete
 								action="?/deleteItem"
